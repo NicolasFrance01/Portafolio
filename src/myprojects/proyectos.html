@@ -43,7 +43,6 @@
         border-radius:8px 8px 0 0;
         background: transparent;
         color:var(--tab-inactive);
-        font-weight: lighter;
         font-size:13px;
         box-shadow: none;
         cursor:pointer;
@@ -269,24 +268,38 @@
     }
 
     .post-card {
-        position: relative;
-        background-color: #0d1117;
-        border: 1px solid #30363d;
-        border-radius: 8px;
-        overflow: hidden;
-        cursor: pointer;
-        transition: transform 0.2s ease, border-color 0.2s ease;
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    }
+
+    .post-card img {
+    width: 100%;
+    height: auto;
+    display: block;
+    filter: brightness(70%);
     }
 
     .post-card:hover {
-        transform: scale(1.03);
-        border-color: #58a6ff;
+    transform: scale(1.02);
     }
 
-    .post-card iframe {
-        width: 100%;
-        height: 280px;
-        pointer-events: none; /* Evita clics dentro del iframe */
+    .post-card .overlay {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    background: rgba(0, 0, 0, 0.4);
+    transition: opacity 0.3s;
+    }
+
+    .post-card:hover .overlay {
+    opacity: 0;
     }
 
     /* === Overlay negro con texto === */
@@ -554,22 +567,40 @@
         <!-- Contribuciones -->
         <div class="contributions" style="box-shadow: 0 0 15px #414141; border-radius: 10px">
             <h3 style="font-weight: lighter;">Publicaciones</h3>
-
             <div class="post-grid">
                 <!-- LinkedIn post -->
-                <div class="post-card" data-link="https://www.linkedin.com/posts/nicol%C3%A1s-daniel-france-496bba288_innovaciaejn-salud-tecnologaeda-activity-7201215904896937987-Onks?utm_source=share&utm_medium=member_desktop&rcm=ACoAAEXyBTIBRZ_vRUcD-IuxvQCGODsOv_n2ES8">
-                <div class="overlay">
-                    <p>Revolucionamos la admisión médica <br> en el Ministerio de Salud, una solución innovadora</p>
-                </div>
-                <iframe src="https://www.linkedin.com/embed/feed/update/urn:li:share:7201215904896937987" frameborder="0" allowfullscreen></iframe>
+                <div class="post-card" onclick="window.open('https://www.linkedin.com/posts/nicol%C3%A1s-daniel-france-496bba288_innovaciaejn-salud-tecnologaeda-activity-7201215904896937987-Onks?utm_source=share&utm_medium=member_desktop&rcm=ACoAAEXyBTIBRZ_vRUcD-IuxvQCGODsOv_n2ES8', '_blank')">
+                    <img style="height: 650px;" src="/imagenes/post/ruh.png" alt="Revolucionamos la admisión médica">
+                    <div class="overlay">
+                        <p>Revolucionamos la admisión médica <br> en el Ministerio de Salud, una solución innovadora</p>
+                    </div>
                 </div>
 
+                
+                <div class="post-card" onclick="window.open('https://www.linkedin.com/posts/nicol%C3%A1s-daniel-france-496bba288_ruh-innovaciaejn-solucionescreativas-activity-7201642135337500672-AGfw?utm_source=share&utm_medium=member_desktop&rcm=ACoAAEXyBTIBRZ_vRUcD-IuxvQCGODsOv_n2ES8', '_blank')">
+                    <img style="height: 650px;" src="/imagenes/post/proto.png" alt="Revolucionamos la admisión médica">
+                    <div class="overlay">
+                        <p>Prototype RUH <br> Ministerio de Salud</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="contributions" style="box-shadow: 0 0 15px #414141; border-radius: 10px">
+            <div class="post-grid">
                 <!-- Instagram post -->
-                <div class="post-card" data-link="https://www.instagram.com/p/DCh50TMxVdD/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==">
+                <div class="post-card" onclick="window.open('https://www.instagram.com/p/DCh50TMxVdD/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==', '_blank')">
+                <img src="/imagenes/DANI/RB9.jpeg" alt="REDBULL Basement - IA entre las 10 mejores en Argentina">
                 <div class="overlay">
                     <p>REDBULL Basement <br> IA entre las 10 mejores en Argentina</p>
                 </div>
-                <iframe src="https://www.instagram.com/p/DCh50TMxVdD/embed" frameborder="0" allowfullscreen></iframe>
+                </div>
+
+                <div class="post-card" onclick="window.open('https://www.linkedin.com/posts/nicol%C3%A1s-daniel-france-496bba288_python-flask-chatbot-activity-7226562131519787009-E5Ji?utm_source=share&utm_medium=member_desktop&rcm=ACoAAEXyBTIBRZ_vRUcD-IuxvQCGODsOv_n2ES8', '_blank')">
+                    <img style="height: 650px;" src="/imagenes/post/proto.png" alt="IA médica">
+                    <div class="overlay">
+                        <p>Implementacion SiSaludBOT <br> IA administrativa para Medicos / Administrativos </p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -577,55 +608,27 @@
         <div class="contributions" style="box-shadow: 0 0 15px #414141; border-radius: 10px">
             <div class="post-grid">
                 <!-- LinkedIn post -->
-                <div class="post-card" data-link="https://www.linkedin.com/posts/nicol%C3%A1s-daniel-france-496bba288_esta-semana-se-cumple-la-2da-semana-sin-novedades-activity-7178375649613541377-k-CK?utm_source=share&utm_medium=member_desktop&rcm=ACoAAEXyBTIBRZ_vRUcD-IuxvQCGODsOv_n2ES8">
-                <div class="overlay">
-                    <p>Implementación del receptor/llamador <br> Hospital Cordoba</p>
-                </div>
-                <iframe src="https://www.linkedin.com/embed/feed/update/urn:li:share:7178375649613541377" frameborder="0" allowfullscreen></iframe>
+                <div class="post-card" onclick="window.open('https://www.linkedin.com/posts/nicol%C3%A1s-daniel-france-496bba288_transformaciaejndigital-salud-hospitalesdecaejrdoba-activity-7199031424010608640-lT4-?utm_source=share&utm_medium=member_desktop&rcm=ACoAAEXyBTIBRZ_vRUcD-IuxvQCGODsOv_n2ES8', '_blank')">
+                    <img style="height: 650px;" src="../../imagenes/post/web min.png" alt="IA médica">
+                    <div class="overlay">
+                        <p>Nueva WEB Hospitalaria <br> Ministerio de Salud - para Medicos / Administrativos</p>
+                    </div>
                 </div>
 
                 <!-- LinkedIn post -->
-                <div class="post-card" data-link="https://www.linkedin.com/posts/nicol%C3%A1s-daniel-france-496bba288_python-flask-chatbot-activity-7226562131519787009-E5Ji?utm_source=share&utm_medium=member_desktop&rcm=ACoAAEXyBTIBRZ_vRUcD-IuxvQCGODsOv_n2ES8">
-                <div class="overlay">
-                    <p>Implementacion SiSaludBOT <br> IA administrativa para Medicos / Administrativos </p>
-                </div>
-                <iframe src="https://www.linkedin.com/embed/feed/update/urn:li:share:7226562131519787009" frameborder="0" allowfullscreen></iframe>
+                <div class="post-card" onclick="window.open('https://www.likedin.com/posts/nicol%C3%A1s-daniel-france-496bba288_esta-semana-se-cumple-la-2da-semana-sin-novedades-activity-7178375649613541377-k-CK?utm_source=share&utm_medium=member_desktop&rcm=ACoAAEXyBTIBRZ_vRUcD-IuxvQCGODsOv_n2ES8', '_blank')">
+                    <img style="height: 650px;" src="../../imagenes/post/llamador - receptor.png" alt="IA médica">
+                    <div class="overlay">
+                        <p>Implementación del receptor/llamador <br> Hospital Cordoba</p>
+                    </div>
                 </div>
             </div>
-        </div>
-
-        <div class="contributions" style="box-shadow: 0 0 15px #414141; border-radius: 10px">
-            <div class="post-grid">
-                <!-- LinkedIn post -->
-                <div class="post-card" data-link="https://www.linkedin.com/posts/nicol%C3%A1s-daniel-france-496bba288_ruh-innovaciaejn-solucionescreativas-activity-7201642135337500672-AGfw?utm_source=share&utm_medium=member_desktop&rcm=ACoAAEXyBTIBRZ_vRUcD-IuxvQCGODsOv_n2ES8">
-                <div class="overlay">
-                    <p>Prototype RUH <br> Ministerio de Salud</p>
-                </div>
-                <iframe src="https://www.linkedin.com/embed/feed/update/urn:li:share:7201642135337500672" frameborder="0" allowfullscreen></iframe>
-                </div>
-
-                <!-- LinkedIn post -->
-                <div class="post-card" data-link="https://www.linkedin.com/posts/nicol%C3%A1s-daniel-france-496bba288_transformaciaejndigital-salud-hospitalesdecaejrdoba-activity-7199031424010608640-lT4-?utm_source=share&utm_medium=member_desktop&rcm=ACoAAEXyBTIBRZ_vRUcD-IuxvQCGODsOv_n2ES8">
-                <div class="overlay">
-                    <p>Nueva WEB Hospitalaria <br> Ministerio de Salud - para Medicos / Administrativos</p>
-                </div>
-                <iframe src="https://www.linkedin.com/embed/feed/update/urn:li:share:7199031424010608640" frameborder="0" allowfullscreen></iframe>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Popup modal -->
-        <div class="modal" id="postModal">
-        <div class="modal-content">
-            <span class="close-btn">&times;</span>
-            <iframe id="modalFrame" src="" frameborder="0" allowfullscreen></iframe>
-        </div>
         </div>
         </section>
 
         <!-- Panel lateral -->
         <aside class="sidebar" style="box-shadow: 0 0 15px #414141; border-radius: 10px">
-        <h3 style="font-weight: lighter;color: white; border-radius: 10px; background-color: #fdfcfc0a;padding: 10px; ">Actividad Reciente</h3>
+        <h3 style="color: white; border-radius: 10px; background-color: #fdfcfc0a;padding: 10px; ">Actividad Reciente</h3>
         <div class="activity-item">
             <p>Actualizó el repositorio <strong>portfolio</strong> <br> hace 2 días</p>
         </div>
@@ -636,7 +639,7 @@
             <p>Mejorando procesos cotidianos en <strong> Procesos Inteligentes</strong></p>
         </div>
 
-        <h4 style="font-weight: lighter; margin-top: 20px; color: white; border-radius: 10px; background-color: #fdfcfc0a;padding: 10px;">Redes Sociales</h4>
+        <h4 style="margin-top: 20px; color: white; border-radius: 10px; background-color: #fdfcfc0a;padding: 10px;">Redes Sociales</h4>
         <div class="social-grid">
             <a href="https://www.instagram.com/dani.iacba" target="_blank" class="social-icon" title="Instagram">
             <svg onclick="window.open('https://www.instagram.com/dani.iacba','_blank')" style="cursor:pointer;" xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-instagram" viewBox="0 0 16 16">
@@ -657,7 +660,7 @@
             </a>
         </div>
 
-        <h4 style="font-weight: lighter; margin-top: 20px; color: white; border-radius: 10px; background-color: #fdfcfc0a; padding: 10px;">
+        <h4 style="margin-top: 20px; color: white; border-radius: 10px; background-color: #fdfcfc0a; padding: 10px;">
             Habilidades Técnicas
         </h4>
 
