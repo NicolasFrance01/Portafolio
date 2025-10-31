@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Proyectos - Nicolas France</title>
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+    /* Window container */
+    .firefox-window{
+        width: 100%;
+        height: 100vh;
+        display:flex;
+        flex-direction:column;
+        box-sizing:border-box;
+        overflow:hidden;
+        overflow-y: auto; /* permitimos scroll vertical */
+    }
+
+    /* top chrome: tabs + controls */
+    .chrome-top{
+        display:flex;
+        align-items:center;
+        gap:10px;
+        background: linear-gradient(180deg, var(--bar), var(--bar2));
+        border-bottom: 1px solid rgba(0, 0, 0, 0.35);
+        -webkit-user-select:none;
+        user-select:none;
+    }
+
+    .tabs {
+        display:flex;
+        gap:8px;
+        align-items:center;
+        flex:1;
+        
+    }
+
+    .tab{
+        display:flex;
+        align-items:center;
+        gap:8px;
+        padding:6px 12px;
+        border-radius:8px 8px 0 0;
+        background: transparent;
+        color:var(--tab-inactive);
+        font-weight: lighter;
+        font-size:13px;
+        box-shadow: none;
+        cursor:pointer;
+    }
+
+    .tab img.tab-icon{ width:16px;height:16px;border-radius:2px;filter:invert(1) contrast(1.1) saturate(0.2); }
+    .tab.active{
+        background: linear-gradient(180deg, rgba(15, 15, 15, 0.03), rgba(0, 0, 0, 0.342));
+        color:var(--tab-active);
+        box-shadow: inset 2px 2px 2px rgba(0,0,0,0.35);
+    }
+
+    .add-tab{
+        padding:6px 10px;
+        border-radius:6px;
+        background:transparent;
+        color:var(--muted);
+        cursor:pointer;
+        font-weight:600;
+    }
+
+    /* right window controls */
+    .window-controls{
+        display:flex;
+        gap:8px;
+        margin-left:auto;
+        align-items:center;
+    }
+    .win-btn{
+        width:34px;height:26px;display:flex;align-items:center;justify-content:center;border-radius:4px;cursor:pointer;color:var(--muted);
+        background:transparent;border:none;font-weight:600;
+    }
+    .win-btn:hover{ background: rgba(255,255,255,0.02); color:#fff; }
+
+    /* content area (where your github will be rendered) */
+    .firefox-content{
+        flex:1;
+        overflow:auto;
+        background: linear-gradient(180deg,#0f1112, #16181a);
+        padding:24px;
+    }
+
+
+    /* --- Reset y variables propias (estilo independiente) --- */
+    :root{
+        --bg: #2b2f33;
+        --bar: #3a3f45;
+        --bar2: #2f3438;
+        --muted: #9aa4ad;
+        --accent: #2ea44f;
+        --tab-active: #ffffff;
+        --tab-inactive: #adb5bd;
+        --glass: rgba(255,255,255,0.03);
+        font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    html,body{height:100%;margin:0; background: linear-gradient(180deg,#0f1112, #16181a); color:#e6eef3;}
+
+
+        main {
+        display: flex;
+        flex: 1;
+        padding: 40px;
+        gap: 40px;
+        }
+
+        /* ====== PERFIL IZQUIERDO ====== */
+        .profile {
+        flex: 0 0 250px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background-color: #161b22;
+        border: 1px solid #30363d;
+        border-radius: 8px;
+        padding: 20px;
+        }
+
+        .profile img {
+        width: 100%;
+        border-radius: 50%;
+        margin-bottom: 15px;
+        border: 2px solid #30363d;
+        }
+
+        .profile h2 {
+        font-size: 1.3rem;
+        color: #fff;
+        margin: 0;
+        }
+
+        .profile p {
+        font-size: 0.9rem;
+        color: #8b949e;
+        text-align: center;
+        }
+
+        /* ====== CONTENIDO PRINCIPAL ====== */
+        .content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        }
+
+        .projects {
+        background-color: #161b22;
+        border: 1px solid #30363d;
+        border-radius: 8px;
+        padding: 20px;
+        }
+
+        .projects h3 {
+        margin-top: 0;
+        color: #fff;
+        margin-bottom: 20px;
+        }
+
+        .project-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 20px;
+        }
+
+        .project-card {
+        background-color: #0d1117;
+        border: 1px solid #30363d;
+        border-radius: 6px;
+        padding: 15px;
+        transition: 0.2s ease;
+        }
+
+        .project-card:hover {
+        border-color: #58a6ff;
+        }
+
+        .project-card h4 {
+        margin: 0 0 10px;
+        color: #58a6ff;
+        }
+
+        .project-card p {
+        font-size: 0.85rem;
+        color: #8b949e;
+        margin: 0;
+        }
+
+        /* ====== CONTRIBUCIONES ====== */
+        .contributions {
+        background-color: #161b22;
+        border: 1px solid #30363d;
+        border-radius: 8px;
+        padding: 20px;
+        }
+
+        .contributions h3 {
+        margin-top: 0;
+        margin-bottom: 15px;
+        color: #fff;
+        }
+
+        .grid {
+        display: grid;
+        grid-template-columns: repeat(52, 10px);
+        grid-auto-rows: 10px;
+        gap: 3px;
+        }
+
+        .square {
+        width: 10px;
+        height: 10px;
+        border-radius: 2px;
+        background-color: #161b22;
+        }
+
+        /*.lvl-1 { background-color: #9be9a8; }
+        .lvl-2 { background-color: #40c463; }
+        .lvl-3 { background-color: #30a14e; }
+        .lvl-4 { background-color: #216e39; }*/
+
+        /* ====== PANEL LATERAL ====== */
+        .sidebar {
+        flex: 0 0 250px;
+        display: flex;
+        flex-direction: column;
+        background-color: #161b22;
+        border: 1px solid #30363d;
+        border-radius: 8px;
+        padding: 20px;
+        }
+
+        .sidebar h3 {
+        margin-top: 0;
+        color: #fff;
+        }
+
+        .activity-item {
+        border-bottom: 1px solid #30363d;
+        padding: 10px 0;
+        }
+
+        .activity-item:last-child {
+        border-bottom: none;
+        }
+
+        .activity-item p {
+        margin: 0;
+        font-size: 0.85rem;
+        color: #8b949e;
+        }
+
+        footer {
+        text-align: center;
+        padding: 20px;
+        border-top: 1px solid #30363d;
+        font-size: 0.8rem;
+        color: #8b949e;
+        }
+
+    .post-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+    }
+
+    .post-card {
+        position: relative;
+        background-color: #0d1117;
+        border: 1px solid #30363d;
+        border-radius: 8px;
+        overflow: hidden;
+        cursor: pointer;
+        transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .post-card:hover {
+        transform: scale(1.03);
+        border-color: #58a6ff;
+    }
+
+    .post-card iframe {
+        width: 100%;
+        height: 280px;
+        pointer-events: none; /* Evita clics dentro del iframe */
+    }
+
+    /* === Overlay negro con texto === */
+    .overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(2px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: opacity 0.3s ease;
+    }
+
+    .overlay p {
+        color: #fff;
+        font-size: 1rem;
+        letter-spacing: 0.5px;
+        text-align: center;
+    }
+
+    .post-card:hover .overlay {
+        opacity: 0;
+    }
+
+    /* ==== MODAL ==== */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 999;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(13, 17, 23, 0.95);
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+    }
+
+    .modal-content {
+        position: relative;
+        background-color: #161b22;
+        border: 1px solid #30363d;
+        border-radius: 8px;
+        padding: 10px;
+        width: 90%;
+        max-width: 800px;
+        animation: fadeIn 0.3s ease;
+    }
+
+    .modal-content iframe {
+        width: 100%;
+        height: 600px;
+        border-radius: 6px;
+    }
+
+    .close-btn {
+        position: absolute;
+        top: 8px;
+        right: 14px;
+        color: #fff;
+        font-size: 22px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .close-btn:hover {
+        color: #58a6ff;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: scale(0.95); }
+        to { opacity: 1; transform: scale(1); }
+    }
+
+    .carousel {
+        position: relative;
+        overflow: hidden;
+        width: 100%;
+        max-width: 1000px;
+        margin: 20px auto;
+        border-radius: 12px;
+        background-color: #161b22;
+        border: 1px solid #30363d;
+        padding: 10px;
+    }
+
+    .carousel-track {
+        display: flex;
+        transition: transform 0.5s ease-in-out;
+    }
+
+    .carousel-item {
+        flex: 0 0 calc(100% / 3); /* 3 imágenes visibles */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 8px;
+    }
+
+    .carousel-item img {
+        width: 100%;
+        height: 240px;
+        object-fit: contain;
+        border-radius: 10px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        background-color: #161b22;
+    }
+
+    .prev, .next {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background-color: rgba(20, 20, 20, 0.7);
+        color: #fff;
+        border: none;
+        font-size: 28px;
+        cursor: pointer;
+        padding: 10px 16px;
+        border-radius: 50%;
+        z-index: 2;
+        transition: background-color 0.3s ease;
+    }
+
+    .prev:hover, .next:hover {
+        background-color: rgba(88, 166, 255, 0.8);
+    }
+
+    .prev { left: 10px; }
+    .next { right: 10px; }
+
+    @media (max-width: 900px) {
+        .carousel-item { flex: 0 0 50%; } /* 2 visibles */
+    }
+
+    @media (max-width: 600px) {
+        .carousel-item { flex: 0 0 100%; } /* 1 visible */
+        .carousel-item img { height: 200px; }
+    }
+
+    .social-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    }
+
+    .social-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #22222200;
+    color: white;
+    border-radius: 10px;
+    padding: 10px;
+    transition: all 0.3s ease;
+    }
+
+    .social-icon:hover {
+    background: #555;
+    transform: scale(1.05);
+    }
+
+    .social-icon svg {
+    width: 50px;
+    height: 50px;
+    }
+
+</style>
+</head>
+<body>
+<div class="firefox-window" id="app">
+
+    <!-- CHROME: TABS + WINDOW CONTROLS -->
+    <div class="chrome-top">
+        <div class="tabs" id="tabs">
+        <div class="tab" data-tab="github">
+            <a href="./firefox.html" style="color: #cbd5db;">
+            <img class="tab-icon" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23ffffff' d='M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.5.5.09.68-.22.68-.48 0-.24-.01-.87-.01-1.7-2.78.6-3.37-1.2-3.37-1.2-.45-1.15-1.11-1.46-1.11-1.46-.91-.62.07-.61.07-.61 1.01.07 1.54 1.04 1.54 1.04.9 1.54 2.36 1.09 2.94.83.09-.65.35-1.09.63-1.34-2.22-.25-4.56-1.11-4.56-4.95 0-1.09.39-1.98 1.03-2.68-.1-.26-.45-1.28.1-2.66 0 0 .84-.27 2.75 1.03A9.56 9.56 0 0112 6.8c.85.004 1.71.115 2.51.338 1.9-1.3 2.74-1.03 2.74-1.03.56 1.38.21 2.4.1 2.66.64.7 1.03 1.59 1.03 2.68 0 3.85-2.35 4.7-4.58 4.95.36.31.68.92.68 1.85 0 1.33-.01 2.41-.01 2.74 0 .26.18.57.69.47A10.01 10.01 0 0022 12c0-5.52-4.48-10-10-10z'/></svg>">
+            D.A.N.I.</a>
+        </div>
+        <div class="tab">
+            <a href="./repositories.html" style="color: #cbd5db;">
+            <img class="tab-icon" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23ffffff' d='M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.5.5.09.68-.22.68-.48 0-.24-.01-.87-.01-1.7-2.78.6-3.37-1.2-3.37-1.2-.45-1.15-1.11-1.46-1.11-1.46-.91-.62.07-.61.07-.61 1.01.07 1.54 1.04 1.54 1.04.9 1.54 2.36 1.09 2.94.83.09-.65.35-1.09.63-1.34-2.22-.25-4.56-1.11-4.56-4.95 0-1.09.39-1.98 1.03-2.68-.1-.26-.45-1.28.1-2.66 0 0 .84-.27 2.75 1.03A9.56 9.56 0 0112 6.8c.85.004 1.71.115 2.51.338 1.9-1.3 2.74-1.03 2.74-1.03.56 1.38.21 2.4.1 2.66.64.7 1.03 1.59 1.03 2.68 0 3.85-2.35 4.7-4.58 4.95.36.31.68.92.68 1.85 0 1.33-.01 2.41-.01 2.74 0 .26.18.57.69.47A10.01 10.01 0 0022 12c0-5.52-4.48-10-10-10z'/></svg>">
+            Repositorios</a></div>
+        <div class="tab active">
+            <a href="./proyectos.html" style="color: #cbd5db;">
+            <img class="tab-icon" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23ffffff' d='M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.5.5.09.68-.22.68-.48 0-.24-.01-.87-.01-1.7-2.78.6-3.37-1.2-3.37-1.2-.45-1.15-1.11-1.46-1.11-1.46-.91-.62.07-.61.07-.61 1.01.07 1.54 1.04 1.54 1.04.9 1.54 2.36 1.09 2.94.83.09-.65.35-1.09.63-1.34-2.22-.25-4.56-1.11-4.56-4.95 0-1.09.39-1.98 1.03-2.68-.1-.26-.45-1.28.1-2.66 0 0 .84-.27 2.75 1.03A9.56 9.56 0 0112 6.8c.85.004 1.71.115 2.51.338 1.9-1.3 2.74-1.03 2.74-1.03.56 1.38.21 2.4.1 2.66.64.7 1.03 1.59 1.03 2.68 0 3.85-2.35 4.7-4.58 4.95.36.31.68.92.68 1.85 0 1.33-.01 2.41-.01 2.74 0 .26.18.57.69.47A10.01 10.01 0 0022 12c0-5.52-4.48-10-10-10z'/></svg>">
+            Perfil</a></div>
+        <div class="tab">
+            + New Tab</div>
+        </div>
+    </div>
+
+    <main>
+        <!-- Perfil Izquierdo -->
+        <aside class="profile" style="box-shadow: 0 0 15px #414141; border-radius: 10px">
+        <img src="/imagenes/unnamed.png" alt="Foto de Nicolas France">
+        <h2 style="font-weight: lighter;">Nicolas France</h2>
+        <p>Especialista Técnico en Sistemas <br><br> Desarrollo de IA y soluciones web</p>
+
+        <p style=" text-align: left; border: white; border-radius: 10px; background-color: #6e6e6e18;box-shadow: 0 0 5px #a8a8a8; padding: 7px; color: #ffffff;">print("¡Hola Mundo! Soy Nicolás") <br> <br>
+
+        Hace unos años ofrecia mis servicios al cuerpo de Infantería en el Ejercito Argentino, encontré mi vocación a la cual después con el tiempo logré hacerla profesión sobre todo lo relacionado a los sistemas en especifico con la programación, infraestructura y análisis de datos. <br> <br>
+
+        Dado este sentir y motivación empecé mis estudios universitarios para ingeniero en sistemas de información, a la vez de realizar cursos varios. <br> <br> 
+
+        Gracias a esto pude conseguir mi primer trabajo como Soporte Infraestructura IT en el Centro de Operaciones y Monitoreo de Sistemas del Ministerio de Salud en Córdoba Argentina, donde tuve compañeros que hoy por hoy los considero mis pilares en esta hermosa profesión.  <br> <br>
+
+        Una gran virtud que destaco es mi facilidad en lo social, lo que me ayudo a conseguir tener un gran grupo de trabajo en la cual todos podamos ayudarnos y lograr aprender todos juntos siempre a la par, dado a eso puedo dirigir y coordinar mi grupo de Infraestructura de manera eficiente, proactiva y comprometida. <br> <br>
+
+        Quiero terminar dejando en claro que me apasiona lo que hago y tanto así me he quedado horas después de horario laboral tratando de terminar proyectos u optimizando actividades o procesos, dando así una graciosa broma de mis compañeros sobre "apagarme la computadora después de horario laboral para descansa". <br> <br> 
+
+        Espero les haya gustado la historia de mi vocación/profesión muchas gracias.</p>
+        </aside>
+
+        <!-- Contenido Principal -->
+        <section class="content">
+            <!-- Carrusel de Certificados -->
+            <div class="certificados">
+                <h3 style="font-weight: lighter; text-align: center;">Certificados</h3>
+                
+                <div class="carousel" style="box-shadow: 0 0 15px #414141; border-radius: 10px;">
+                <button class="prev">&#10094;</button>
+                
+                <div class="carousel-track">
+                    <div class="carousel-item">
+                    <img src="../resources/certificados/1759595425385.jpg" alt="Certificado 1">
+                    </div>
+                    <div class="carousel-item">
+                    <img src="../resources/certificados/1728654613382.jpg" alt="Certificado 2">
+                    </div>
+                    <div class="carousel-item">
+                    <img src="../resources/certificados/1721907468370.jpg" alt="Certificado 3">
+                    </div>
+                    <div class="carousel-item">
+                    <img src="../resources/certificados/1751465790366.jpg" alt="Certificado 4">
+                    </div>
+                    <div class="carousel-item">
+                    <img src="../resources/certificados/1719849733192.jpg" alt="Certificado 5">
+                    </div>
+                    <div class="carousel-item">
+                    <img src="../resources/certificados/1718725861637.jpg" alt="Certificado 6">
+                    </div>
+                    <div class="carousel-item">
+                    <img src="../resources/certificados/1736785001746.jpg" alt="Certificado 7">
+                    </div>
+                    <div class="carousel-item">
+                    <img src="../resources/certificados/1736783889595.jpg" alt="Certificado 8">
+                    </div>
+                    <div class="carousel-item">
+                    <img src="../resources/certificados/1706039155899_page-0001.jpg" alt="Certificado 9">
+                    </div>
+                    <!-- Podés agregar más imágenes -->
+                </div>
+                
+                <button class="next">&#10095;</button>
+                </div>
+            </div>
+            
+
+        <!-- Contribuciones -->
+        <div class="contributions" style="box-shadow: 0 0 15px #414141; border-radius: 10px">
+            <h3 style="font-weight: lighter;">Publicaciones</h3>
+
+            <div class="post-grid">
+                <!-- LinkedIn post -->
+                <div class="post-card" data-link="https://www.linkedin.com/posts/nicol%C3%A1s-daniel-france-496bba288_innovaciaejn-salud-tecnologaeda-activity-7201215904896937987-Onks?utm_source=share&utm_medium=member_desktop&rcm=ACoAAEXyBTIBRZ_vRUcD-IuxvQCGODsOv_n2ES8">
+                <div class="overlay">
+                    <p>Revolucionamos la admisión médica <br> en el Ministerio de Salud, una solución innovadora</p>
+                </div>
+                <iframe src="https://www.linkedin.com/embed/feed/update/urn:li:share:7201215904896937987" frameborder="0" allowfullscreen></iframe>
+                </div>
+
+                <!-- Instagram post -->
+                <div class="post-card" data-link="https://www.instagram.com/p/DCh50TMxVdD/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==">
+                <div class="overlay">
+                    <p>REDBULL Basement <br> IA entre las 10 mejores en Argentina</p>
+                </div>
+                <iframe src="https://www.instagram.com/p/DCh50TMxVdD/embed" frameborder="0" allowfullscreen></iframe>
+                </div>
+            </div>
+        </div>
+
+        <div class="contributions" style="box-shadow: 0 0 15px #414141; border-radius: 10px">
+            <div class="post-grid">
+                <!-- LinkedIn post -->
+                <div class="post-card" data-link="https://www.linkedin.com/posts/nicol%C3%A1s-daniel-france-496bba288_esta-semana-se-cumple-la-2da-semana-sin-novedades-activity-7178375649613541377-k-CK?utm_source=share&utm_medium=member_desktop&rcm=ACoAAEXyBTIBRZ_vRUcD-IuxvQCGODsOv_n2ES8">
+                <div class="overlay">
+                    <p>Implementación del receptor/llamador <br> Hospital Cordoba</p>
+                </div>
+                <iframe src="https://www.linkedin.com/embed/feed/update/urn:li:share:7178375649613541377" frameborder="0" allowfullscreen></iframe>
+                </div>
+
+                <!-- LinkedIn post -->
+                <div class="post-card" data-link="https://www.linkedin.com/posts/nicol%C3%A1s-daniel-france-496bba288_python-flask-chatbot-activity-7226562131519787009-E5Ji?utm_source=share&utm_medium=member_desktop&rcm=ACoAAEXyBTIBRZ_vRUcD-IuxvQCGODsOv_n2ES8">
+                <div class="overlay">
+                    <p>Implementacion SiSaludBOT <br> IA administrativa para Medicos / Administrativos </p>
+                </div>
+                <iframe src="https://www.linkedin.com/embed/feed/update/urn:li:share:7226562131519787009" frameborder="0" allowfullscreen></iframe>
+                </div>
+            </div>
+        </div>
+
+        <div class="contributions" style="box-shadow: 0 0 15px #414141; border-radius: 10px">
+            <div class="post-grid">
+                <!-- LinkedIn post -->
+                <div class="post-card" data-link="https://www.linkedin.com/posts/nicol%C3%A1s-daniel-france-496bba288_ruh-innovaciaejn-solucionescreativas-activity-7201642135337500672-AGfw?utm_source=share&utm_medium=member_desktop&rcm=ACoAAEXyBTIBRZ_vRUcD-IuxvQCGODsOv_n2ES8">
+                <div class="overlay">
+                    <p>Prototype RUH <br> Ministerio de Salud</p>
+                </div>
+                <iframe src="https://www.linkedin.com/embed/feed/update/urn:li:share:7201642135337500672" frameborder="0" allowfullscreen></iframe>
+                </div>
+
+                <!-- LinkedIn post -->
+                <div class="post-card" data-link="https://www.linkedin.com/posts/nicol%C3%A1s-daniel-france-496bba288_transformaciaejndigital-salud-hospitalesdecaejrdoba-activity-7199031424010608640-lT4-?utm_source=share&utm_medium=member_desktop&rcm=ACoAAEXyBTIBRZ_vRUcD-IuxvQCGODsOv_n2ES8">
+                <div class="overlay">
+                    <p>Nueva WEB Hospitalaria <br> Ministerio de Salud - para Medicos / Administrativos</p>
+                </div>
+                <iframe src="https://www.linkedin.com/embed/feed/update/urn:li:share:7199031424010608640" frameborder="0" allowfullscreen></iframe>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Popup modal -->
+        <div class="modal" id="postModal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <iframe id="modalFrame" src="" frameborder="0" allowfullscreen></iframe>
+        </div>
+        </div>
+        </section>
+
+        <!-- Panel lateral -->
+        <aside class="sidebar" style="box-shadow: 0 0 15px #414141; border-radius: 10px">
+        <h3 style="font-weight: lighter;color: white; border-radius: 10px; background-color: #fdfcfc0a;padding: 10px; ">Actividad Reciente</h3>
+        <div class="activity-item">
+            <p>Actualizó el repositorio <strong>portfolio</strong> <br> hace 2 días</p>
+        </div>
+        <div class="activity-item">
+            <p>Nuevos certificados en <br> <strong>Inteligencia Artificial</strong></p>
+        </div>
+        <div class="activity-item">
+            <p>Mejorando procesos cotidianos en <strong> Procesos Inteligentes</strong></p>
+        </div>
+
+        <h4 style="font-weight: lighter; margin-top: 20px; color: white; border-radius: 10px; background-color: #fdfcfc0a;padding: 10px;">Redes Sociales</h4>
+        <div class="social-grid">
+            <a href="https://www.instagram.com/dani.iacba" target="_blank" class="social-icon" title="Instagram">
+            <svg onclick="window.open('https://www.instagram.com/dani.iacba','_blank')" style="cursor:pointer;" xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-instagram" viewBox="0 0 16 16">
+                <path d="M8 0C5.829 0 5.556.01 4.703.048 3.85.088 3.269.222 2.76.42a3.9 3.9 0 0 0-1.417.923A3.9 3.9 0 0 0 .42 2.76C.222 3.268.087 3.85.048 4.7.01 5.555 0 5.827 0 8.001c0 2.172.01 2.444.048 3.297.04.852.174 1.433.372 1.942.205.526.478.972.923 1.417.444.445.89.719 1.416.923.51.198 1.09.333 1.942.372C5.555 15.99 5.827 16 8 16s2.444-.01 3.298-.048c.851-.04 1.434-.174 1.943-.372a3.9 3.9 0 0 0 1.416-.923c.445-.445.718-.891.923-1.417.197-.509.332-1.09.372-1.942C15.99 10.445 16 10.173 16 8s-.01-2.445-.048-3.299c-.04-.851-.175-1.433-.372-1.941a3.9 3.9 0 0 0-.923-1.417A3.9 3.9 0 0 0 13.24.42c-.51-.198-1.092-.333-1.943-.372C10.443.01 10.172 0 7.998 0zm-.717 1.442h.718c2.136 0 2.389.007 3.232.046.78.035 1.204.166 1.486.275.373.145.64.319.92.599s.453.546.598.92c.11.281.24.705.275 1.485.039.843.047 1.096.047 3.231s-.008 2.389-.047 3.232c-.035.78-.166 1.203-.275 1.485a2.5 2.5 0 0 1-.599.919c-.28.28-.546.453-.92.598-.28.11-.704.24-1.485.276-.843.038-1.096.047-3.232.047s-2.39-.009-3.233-.047c-.78-.036-1.203-.166-1.485-.276a2.5 2.5 0 0 1-.92-.598 2.5 2.5 0 0 1-.6-.92c-.109-.281-.24-.705-.275-1.485-.038-.843-.046-1.096-.046-3.233s.008-2.388.046-3.231c.036-.78.166-1.204.276-1.486.145-.373.319-.64.599-.92s.546-.453.92-.598c.282-.11.705-.24 1.485-.276.738-.034 1.024-.044 2.515-.045zm4.988 1.328a.96.96 0 1 0 0 1.92.96.96 0 0 0 0-1.92m-4.27 1.122a4.109 4.109 0 1 0 0 8.217 4.109 4.109 0 0 0 0-8.217m0 1.441a2.667 2.667 0 1 1 0 5.334 2.667 2.667 0 0 1 0-5.334"/>
+            </svg>
+            </a>
+
+            <a href="https://www.linkedin.com/in/nicolás-daniel-france-496bba288" target="_blank" class="social-icon" title="LinkedIn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-linkedin" viewBox="0 0 16 16">
+                <path d="M0 1.146C0 .513.526 0 1.175 0h13.65C15.474 0 16 .513 16 1.146v13.708c0 .633-.526 1.146-1.175 1.146H1.175C.526 16 0 15.487 0 14.854zm4.943 12.248V6.169H2.542v7.225zm-1.2-8.212c.837 0 1.358-.554 1.358-1.248-.015-.709-.52-1.248-1.342-1.248S2.4 3.226 2.4 3.934c0 .694.521 1.248 1.327 1.248zm4.908 8.212V9.359c0-.216.016-.432.08-.586.173-.431.568-.878 1.232-.878.869 0 1.216.662 1.216 1.634v3.865h2.401V9.25c0-2.22-1.184-3.252-2.764-3.252-1.274 0-1.845.7-2.165 1.193v.025h-.016l.016-.025V6.169h-2.4c.03.678 0 7.225 0 7.225z"/>
+            </svg>
+            </a>
+
+            <a href="https://www.youtube.com/@NicolasFrance-p9c" target="_blank" class="social-icon" title="YouTube">
+            <svg  onclick="window.open('https://www.youtube.com/@NicolasFrance-p9c','_blank')" style="cursor:pointer;" xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-youtube" viewBox="0 0 16 16">
+                <path d="M8.051 1.999h.089c.822.003 4.987.033 6.11.335a2.01 2.01 0 0 1 1.415 1.42c.101.38.172.883.22 1.402l.01.104.022.26.008.104c.065.914.073 1.77.074 1.957v.075c-.001.194-.01 1.108-.082 2.06l-.008.105-.009.104c-.05.572-.124 1.14-.235 1.558a2.01 2.01 0 0 1-1.415 1.42c-1.16.312-5.569.334-6.18.335h-.142c-.309 0-1.587-.006-2.927-.052l-.17-.006-.087-.004-.171-.007-.171-.007c-1.11-.049-2.167-.128-2.654-.26a2.01 2.01 0 0 1-1.415-1.419c-.111-.417-.185-.986-.235-1.558L.09 9.82l-.008-.104A31 31 0 0 1 0 7.68v-.123c.002-.215.01-.958.064-1.778l.007-.103.003-.052.008-.104.022-.26.01-.104c.048-.519.119-1.023.22-1.402a2.01 2.01 0 0 1 1.415-1.42c.487-.13 1.544-.21 2.654-.26l.17-.007.172-.006.086-.003.171-.007A100 100 0 0 1 7.858 2zM6.4 5.209v4.818l4.157-2.408z"/>
+            </svg>
+            </a>
+        </div>
+
+        <h4 style="font-weight: lighter; margin-top: 20px; color: white; border-radius: 10px; background-color: #fdfcfc0a; padding: 10px;">
+            Habilidades Técnicas
+        </h4>
+
+        <div class="social-grid">
+            <!-- AI -->
+            <a href="https://www.microsoft.com/sql-server" target="_blank" class="social-icon" title="Inteligencia Artificial">
+                <svg width="100%" height="100%" viewBox="0 0 512 512" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="#ffffff"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>ai</title> <g id="Page-1" stroke="none" stroke-width="1" #ffffffill="none" #ffffffill-rule="evenodd"> <g id="icon" #ffffffill="#ffffff" trans#fffffform="translate(64.000000, 64.000000)"> <path d="M320,64 L320,320 L64,320 L64,64 L320,64 Z M171.749388,128 L146.817842,128 L99.4840387,256 L121.976629,256 L130.913039,230.977 L187.575039,230.977 L196.319607,256 L220.167172,256 L171.749388,128 Z M260.093778,128 L237.691519,128 L237.691519,256 L260.093778,256 L260.093778,128 Z M159.094727,149.47526 L181.409039,213.333 L137.135039,213.333 L159.094727,149.47526 Z M341.333333,256 L384,256 L384,298.666667 L341.333333,298.666667 L341.333333,256 Z M85.3333333,341.333333 L128,341.333333 L128,384 L85.3333333,384 L85.3333333,341.333333 Z M170.666667,341.333333 L213.333333,341.333333 L213.333333,384 L170.666667,384 L170.666667,341.333333 Z M85.3333333,0 L128,0 L128,42.6666667 L85.3333333,42.6666667 L85.3333333,0 Z M256,341.333333 L298.666667,341.333333 L298.666667,384 L256,384 L256,341.333333 Z M170.666667,0 L213.333333,0 L213.333333,42.6666667 L170.666667,42.6666667 L170.666667,0 Z M256,0 L298.666667,0 L298.666667,42.6666667 L256,42.6666667 L256,0 Z M341.333333,170.666667 L384,170.666667 L384,213.333333 L341.333333,213.333333 L341.333333,170.666667 Z M0,256 L42.6666667,256 L42.6666667,298.666667 L0,298.666667 L0,256 Z M341.333333,85.3333333 L384,85.3333333 L384,128 L341.333333,128 L341.333333,85.3333333 Z M0,170.666667 L42.6666667,170.666667 L42.6666667,213.333333 L0,213.333333 L0,170.666667 Z M0,85.3333333 L42.6666667,85.3333333 L42.6666667,128 L0,128 L0,85.3333333 Z" id="Combined-Shape"> </path> </g> </g> </g>
+                </svg>
+            </a>
+
+            <!-- Atomation -->
+            <a href="https://www.microsoft.com/sql-server" target="_blank" class="social-icon" title="Automatizaciones">
+                <svg fill="#1e81cc" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 32 32" xml:space="preserve"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path id="automation--decision_1_" d="M27.255,19.255L30.509,16l-3.254-3.254l-0.51,0.509l2.386,2.386H16.149L9.36,8.85V5.36h19.771 l-2.386,2.386l0.51,0.509L30.509,5l-3.254-3.254l-0.51,0.509l2.386,2.386H9C8.801,4.64,8.64,4.801,8.64,5v3.85l-6.895,6.896 c-0.141,0.141-0.141,0.368,0,0.509L8.64,23.15V27c0,0.199,0.161,0.36,0.36,0.36h20.131l-2.386,2.385l0.51,0.51L30.509,27 l-3.254-3.255l-0.51,0.51l2.386,2.385H9.36v-3.49l6.789-6.79h12.982l-2.386,2.385L27.255,19.255z M9,22.491L2.509,16L9,9.508 L15.491,16L9,22.491z"></path> <rect id="_Transparent_Rectangle" style="fill:none;" width="32" height="32"></rect> </g>
+                </svg>
+            </a>
+
+            <!-- Python -->
+            <a href="#" class="social-icon" title="Python">
+                <svg xmlns="http://www.w3.org/2000/svg" width="800px" height="800px" viewBox="0 0 32 32" fill="none">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M13.0164 2C10.8193 2 9.03825 3.72453 9.03825 5.85185V8.51852H15.9235V9.25926H5.97814C3.78107 9.25926 2 10.9838 2 13.1111L2 18.8889C2 21.0162 3.78107 22.7407 5.97814 22.7407H8.27322V19.4815C8.27322 17.3542 10.0543 15.6296 12.2514 15.6296H19.5956C21.4547 15.6296 22.9617 14.1704 22.9617 12.3704V5.85185C22.9617 3.72453 21.1807 2 18.9836 2H13.0164ZM12.0984 6.74074C12.8589 6.74074 13.4754 6.14378 13.4754 5.40741C13.4754 4.67103 12.8589 4.07407 12.0984 4.07407C11.3378 4.07407 10.7213 4.67103 10.7213 5.40741C10.7213 6.14378 11.3378 6.74074 12.0984 6.74074Z" fill="url(#paint0_linear_87_8204)"/>
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M18.9834 30C21.1805 30 22.9616 28.2755 22.9616 26.1482V23.4815L16.0763 23.4815L16.0763 22.7408L26.0217 22.7408C28.2188 22.7408 29.9998 21.0162 29.9998 18.8889V13.1111C29.9998 10.9838 28.2188 9.25928 26.0217 9.25928L23.7266 9.25928V12.5185C23.7266 14.6459 21.9455 16.3704 19.7485 16.3704L12.4042 16.3704C10.5451 16.3704 9.03809 17.8296 9.03809 19.6296L9.03809 26.1482C9.03809 28.2755 10.8192 30 13.0162 30H18.9834ZM19.9015 25.2593C19.1409 25.2593 18.5244 25.8562 18.5244 26.5926C18.5244 27.329 19.1409 27.9259 19.9015 27.9259C20.662 27.9259 21.2785 27.329 21.2785 26.5926C21.2785 25.8562 20.662 25.2593 19.9015 25.2593Z" fill="url(#paint1_linear_87_8204)"/>
+                <defs>
+                <linearGradient id="paint0_linear_87_8204" x1="12.4809" y1="2" x2="12.4809" y2="22.7407" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#327EBD"/>
+                <stop offset="1" stop-color="#1565A7"/>
+                </linearGradient>
+                <linearGradient id="paint1_linear_87_8204" x1="19.519" y1="9.25928" x2="19.519" y2="30" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#FFDA4B"/>
+                <stop offset="1" stop-color="#F9C600"/>
+                </linearGradient>
+                </defs>
+                </svg>
+            </a>
+
+            <!-- Docker -->
+            <a href="#" class="social-icon" title="Docker">
+            <svg xmlns="http://www.w3.org/2000/svg" id="Layer_1" data-name="Layer 1" viewBox="0 0 756.26 596.9">
+            <defs>
+                <style>
+                .cls-1 {
+                    fill: #1d63ed;
+                    stroke-width: 0px;
+                }
+                </style>
+            </defs>
+            <path class="cls-1" d="M743.96,245.25c-18.54-12.48-67.26-17.81-102.68-8.27-1.91-35.28-20.1-65.01-53.38-90.95l-12.32-8.27-8.21,12.4c-16.14,24.5-22.94,57.14-20.53,86.81,1.9,18.28,8.26,38.83,20.53,53.74-46.1,26.74-88.59,20.67-276.77,20.67H.06c-.85,42.49,5.98,124.23,57.96,190.77,5.74,7.35,12.04,14.46,18.87,21.31,42.26,42.32,106.11,73.35,201.59,73.44,145.66.13,270.46-78.6,346.37-268.97,24.98.41,90.92,4.48,123.19-57.88.79-1.05,8.21-16.54,8.21-16.54l-12.3-8.27ZM189.67,206.39h-81.7v81.7h81.7v-81.7ZM295.22,206.39h-81.7v81.7h81.7v-81.7ZM400.77,206.39h-81.7v81.7h81.7v-81.7ZM506.32,206.39h-81.7v81.7h81.7v-81.7ZM84.12,206.39H2.42v81.7h81.7v-81.7ZM189.67,103.2h-81.7v81.7h81.7v-81.7ZM295.22,103.2h-81.7v81.7h81.7v-81.7ZM400.77,103.2h-81.7v81.7h81.7v-81.7ZM400.77,0h-81.7v81.7h81.7V0Z"/>
+            </svg>
+            </a>
+
+            <!-- Bases de Datos -->
+            <a href="https://www.microsoft.com/sql-server" target="_blank" class="social-icon" title="SQL Server / PostgreSQL / Oracle DB">
+                <svg fill="#696969" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 212 260" xml:space="preserve" stroke="#696969"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M210,210c0,26.5-46.6,48-104,48S2,236.5,2,210v-23c6.3,6.1,14.5,11.6,24.6,16.3c21.4,9.9,49.6,15.3,79.4,15.3 s58-5.5,79.4-15.3c10.1-4.7,18.3-10.1,24.6-16.2L210,210z M185.4,150c-21.4,9.9-49.6,15.3-79.4,15.3c-29.8,0-58-5.5-79.4-15.3 C16.5,145.3,8.2,139.8,2,133.7v23.6h0c0.8,26.2,47,47.3,104,47.3c57.4,0,104-21.5,104-48l0-22.9C203.7,139.8,195.5,145.3,185.4,150z M106,2C48.6,2,2,23.5,2,50s46.6,48,104,48s104-21.5,104-48S163.4,2,106,2z M185.4,96.7C164,106.5,135.8,112,106,112 s-58-5.5-79.4-15.3C16.5,92,8.2,86.5,2,80.4v23c0,26.5,46.6,48,104,48s104-21.5,104-48l0-22.9C203.7,86.5,195.5,92,185.4,96.7z"></path> </g>
+                </svg>
+            </a>
+
+            <!-- Linux -->
+            <a href="#" class="social-icon" title="Linux">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-tux" viewBox="0 0 16 16">
+                <path d="M8.996 4.497c.104-.076.1-.168.186-.158s.022.102-.098.207c-.12.104-.308.243-.46.323-.291.152-.631.336-.993.336s-.647-.167-.853-.33c-.102-.082-.186-.162-.248-.221-.11-.086-.096-.207-.052-.204.075.01.087.109.134.153.064.06.144.137.241.214.195.154.454.304.778.304s.702-.19.932-.32c.13-.073.297-.204.433-.304M7.34 3.781c.055-.02.123-.031.174-.003.011.006.024.021.02.034-.012.038-.074.032-.11.05-.032.017-.057.052-.093.054-.034 0-.086-.012-.09-.046-.007-.044.058-.072.1-.089m.581-.003c.05-.028.119-.018.173.003.041.017.106.045.1.09-.004.033-.057.046-.09.045-.036-.002-.062-.037-.093-.053-.036-.019-.098-.013-.11-.051-.004-.013.008-.028.02-.034"/>
+                <path fill-rule="evenodd" d="M8.446.019c2.521.003 2.38 2.66 2.364 4.093-.01.939.509 1.574 1.04 2.244.474.56 1.095 1.38 1.45 2.32.29.765.402 1.613.115 2.465a.8.8 0 0 1 .254.152l.001.002c.207.175.271.447.329.698.058.252.112.488.224.615.344.382.494.667.48.922-.015.254-.203.43-.435.57-.465.28-1.164.491-1.586 1.002-.443.527-.99.83-1.505.871a1.25 1.25 0 0 1-1.256-.716v-.001a1 1 0 0 1-.078-.21c-.67.038-1.252-.165-1.718-.128-.687.038-1.116.204-1.506.206-.151.331-.445.547-.808.63-.5.114-1.126 0-1.743-.324-.577-.306-1.31-.278-1.85-.39-.27-.057-.51-.157-.626-.384-.116-.226-.095-.538.07-.988.051-.16.012-.398-.026-.648a2.5 2.5 0 0 1-.037-.369c0-.133.022-.265.087-.386v-.002c.14-.266.368-.377.577-.451s.397-.125.53-.258c.143-.15.27-.374.443-.56q.036-.037.073-.07c-.081-.538.007-1.105.192-1.662.393-1.18 1.223-2.314 1.811-3.014.502-.713.65-1.287.701-2.016.042-.997-.705-3.974 2.112-4.2q.168-.015.321-.013m2.596 10.866-.03.016c-.223.121-.348.337-.427.656-.08.32-.107.733-.13 1.206v.001c-.023.37-.192.824-.31 1.267s-.176.862-.036 1.128v.002c.226.452.608.636 1.051.601s.947-.304 1.36-.795c.474-.576 1.218-.796 1.638-1.05.21-.126.324-.242.333-.4.009-.157-.097-.403-.425-.767-.17-.192-.217-.462-.274-.71-.056-.247-.122-.468-.26-.585l-.001-.001c-.18-.157-.356-.17-.565-.164q-.069.001-.14.005c-.239.275-.805.612-1.197.508-.359-.09-.562-.508-.587-.918m-7.204.03H3.83c-.189.002-.314.09-.44.225-.149.158-.276.382-.445.56v.002h-.002c-.183.184-.414.239-.61.31-.195.069-.353.143-.46.35v.002c-.085.155-.066.378-.029.624.038.245.096.507.018.746v.002l-.001.002c-.157.427-.155.678-.082.822.074.143.235.22.48.272.493.103 1.26.069 1.906.41.583.305 1.168.404 1.598.305.431-.098.712-.369.75-.867v-.002c.029-.292-.195-.673-.485-1.052-.29-.38-.633-.752-.795-1.09v-.002l-.61-1.11c-.21-.286-.43-.462-.68-.5a1 1 0 0 0-.106-.008M9.584 4.85c-.14.2-.386.37-.695.467-.147.048-.302.17-.495.28a1.3 1.3 0 0 1-.74.19.97.97 0 0 1-.582-.227c-.14-.113-.25-.237-.394-.322a3 3 0 0 1-.192-.126c-.063 1.179-.85 2.658-1.226 3.511a5.4 5.4 0 0 0-.43 1.917c-.68-.906-.184-2.066.081-2.568.297-.55.343-.701.27-.649-.266.436-.685 1.13-.848 1.844-.085.372-.1.749.01 1.097.11.349.345.67.766.931.573.351.963.703 1.193 1.015s.302.584.23.777a.4.4 0 0 1-.212.22.7.7 0 0 1-.307.056l.184.235c.094.124.186.249.266.375 1.179.805 2.567.496 3.568-.218.1-.342.197-.664.212-.903.024-.474.05-.896.136-1.245s.244-.634.53-.791a1 1 0 0 1 .138-.061q.005-.045.013-.087c.082-.546.569-.572 1.18-.303.588.266.81.499.71.814h.13c.122-.398-.133-.69-.822-1.025l-.137-.06a2.35 2.35 0 0 0-.012-1.113c-.188-.79-.704-1.49-1.098-1.838-.072-.003-.065.06.081.203.363.333 1.156 1.532.727 2.644a1.2 1.2 0 0 0-.342-.043c-.164-.907-.543-1.66-.735-2.014-.359-.668-.918-2.036-1.158-2.983M7.72 3.503a1 1 0 0 0-.312.053c-.268.093-.447.286-.559.391-.022.021-.05.04-.119.091s-.172.126-.321.238q-.198.151-.13.38c.046.15.192.325.459.476.166.098.28.23.41.334a1 1 0 0 0 .215.133.9.9 0 0 0 .298.066c.282.017.49-.068.673-.173s.34-.233.518-.29c.365-.115.627-.345.709-.564a.37.37 0 0 0-.01-.309c-.048-.096-.148-.187-.318-.257h-.001c-.354-.151-.507-.162-.705-.29-.321-.207-.587-.28-.807-.279m-.89-1.122h-.025a.4.4 0 0 0-.278.135.76.76 0 0 0-.191.334 1.2 1.2 0 0 0-.051.445v.001c.01.162.041.299.102.436.05.116.109.204.183.274l.089-.065.117-.09-.023-.018a.4.4 0 0 1-.11-.161.7.7 0 0 1-.054-.22v-.01a.7.7 0 0 1 .014-.234.4.4 0 0 1 .08-.179q.056-.069.126-.073h.013a.18.18 0 0 1 .123.05c.045.04.08.09.11.162a.7.7 0 0 1 .054.22v.01a.7.7 0 0 1-.002.17 1.1 1.1 0 0 1 .317-.143 1.3 1.3 0 0 0 .002-.194V3.23a1.2 1.2 0 0 0-.102-.437.8.8 0 0 0-.227-.31.4.4 0 0 0-.268-.102m1.95-.155a.63.63 0 0 0-.394.14.9.9 0 0 0-.287.376 1.2 1.2 0 0 0-.1.51v.015q0 .079.01.152c.114.027.278.074.406.138a1 1 0 0 1-.011-.172.8.8 0 0 1 .058-.278.5.5 0 0 1 .139-.2.26.26 0 0 1 .182-.069.26.26 0 0 1 .178.081c.055.054.094.12.124.21.029.086.042.17.04.27l-.002.012a.8.8 0 0 1-.057.277c-.024.059-.089.106-.122.145.046.016.09.03.146.052a5 5 0 0 1 .248.102 1.2 1.2 0 0 0 .244-.763 1.2 1.2 0 0 0-.11-.495.9.9 0 0 0-.294-.37.64.64 0 0 0-.39-.133z"/>
+                </svg>
+            </a>
+
+            <!-- HTML -->
+            <a href="#" class="social-icon" title="HTML5">
+                <svg xmlns="http://www.w3.org/2000/svg" width="800px" height="800px" viewBox="0 0 32 32" fill="none">
+                <path d="M6 28L4 3H28L26 28L16 31L6 28Z" fill="#E44D26"/>
+                <path d="M26 5H16V29.5L24 27L26 5Z" fill="#F16529"/>
+                <path d="M9.5 17.5L8.5 8H24L23.5 11H11.5L12 14.5H23L22 24L16 26L10 24L9.5 19H12.5L13 21.5L16 22.5L19 21.5L19.5 17.5H9.5Z" fill="white"/>
+                </svg>
+            </a>
+
+            <!-- JavaScript -->
+            <a href="#" class="social-icon" title="JavaScript">
+                <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="800px" height="800px" viewBox="0 0 256 256" version="1.1" preserveAspectRatio="xMidYMid">
+                    <g>
+                        <path d="M0,0 L256,0 L256,256 L0,256 L0,0 Z" fill="#F7DF1E">
+
+                </path>
+                        <path d="M67.311746,213.932292 L86.902654,202.076241 C90.6821079,208.777346 94.1202286,214.447137 102.367086,214.447137 C110.272203,214.447137 115.256076,211.354819 115.256076,199.326883 L115.256076,117.528787 L139.313575,117.528787 L139.313575,199.666997 C139.313575,224.58433 124.707759,235.925943 103.3984,235.925943 C84.1532952,235.925943 72.9819429,225.958603 67.3113397,213.93026" fill="#000000">
+
+                </path>
+                        <path d="M152.380952,211.354413 L171.969422,200.0128 C177.125994,208.433981 183.827911,214.619835 195.684368,214.619835 C205.652521,214.619835 212.009041,209.635962 212.009041,202.762159 C212.009041,194.513676 205.479416,191.592025 194.481168,186.78207 L188.468419,184.202565 C171.111213,176.81473 159.597308,167.53534 159.597308,147.944838 C159.597308,129.901308 173.344508,116.153295 194.825752,116.153295 C210.119924,116.153295 221.117765,121.48094 229.021663,135.400432 L210.29059,147.428775 C206.166146,140.040127 201.699556,137.119289 194.826159,137.119289 C187.78047,137.119289 183.312254,141.587098 183.312254,147.428775 C183.312254,154.646349 187.78047,157.568406 198.089956,162.036622 L204.103924,164.614095 C224.553448,173.378641 236.067352,182.313448 236.067352,202.418387 C236.067352,224.071924 219.055137,235.927975 196.200432,235.927975 C173.860978,235.927975 159.425829,225.274311 152.381359,211.354413" fill="#000000">
+
+                </path>
+                    </g>
+                </svg>
+            </a>
+
+            <!-- CSS -->
+            <a href="#" class="social-icon" title="CSS">
+                <svg xmlns="http://www.w3.org/2000/svg" width="800px" height="800px" viewBox="0 0 32 32" fill="none">
+                <path d="M6 28L4 3H28L26 28L16 31L6 28Z" fill="#1172B8"/>
+                <path d="M26 5H16V29.5L24 27L26 5Z" fill="#33AADD"/>
+                <path d="M19.5 17.5H9.5L9 14L17 11.5H9L8.5 8.5H24L23.5 12L17 14.5H23L22 24L16 26L10 24L9.5 19H12.5L13 21.5L16 22.5L19 21.5L19.5 17.5Z" fill="white"/>
+                </svg>
+            </a>
+
+            <!-- GitHub -->
+            <a href="https://github.com/nicolasfrance" target="_blank" class="social-icon" title="GitHub">
+                <svg fill="#ffffff" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg" stroke="#ffffff"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path d="M0 15c0 7.033 4.836 12.945 11.375 14.563.3.077.635-.19.625-.5V22.5c0-.333.197-.652.563-.844.37-.185.28-.856-.125-.937-1.9-.38-3.52-1.143-4.657-2.157C6.646 17.547 6 16.314 6 15c0-.915.327-1.793.906-2.594.06-.082.092-.18.094-.28V7.343l3.97 2.125c.122.066.273.077.405.03C12.488 9.168 13.698 9 15 9s2.512.168 3.625.5c.132.047.283.035.406-.03L23 7.343v4.78c.002.1.035.2.094.282.58.8.906 1.68.906 2.594 0 1.315-.645 2.548-1.78 3.563-1.138 1.014-2.76 1.776-4.657 2.156-.406.08-.495.75-.125.936.365.192.562.51.562.844v6.563c-.01.31.326.577.625.5C25.165 27.945 30 22.032 30 15c0-8.278-6.722-15-15-15C6.722 0 0 6.722 0 15zM15 1c7.738 0 14 6.262 14 14 0 6.33-4.24 11.547-10 13.28V22.5c0-.4-.154-.756-.375-1.063 1.663-.457 3.182-1.175 4.28-2.156C24.206 18.124 25 16.64 25 15c0-1.083-.394-2.074-1-2.97V6.5c.003-.35-.446-.613-.75-.437L18.656 8.53C17.516 8.22 16.296 8 15 8c-1.295 0-2.517.218-3.656.53L6.75 6.064c-.304-.176-.753.087-.75.437v5.53c-.606.896-1 1.887-1 2.97 0 1.64.795 3.123 2.094 4.28 1.1.982 2.62 1.7 4.28 2.158-.22.306-.374.66-.374 1.062v1.688c-1.09.406-1.807.493-2.25.406-.478-.094-.736-.34-1.03-.75-.592-.823-1.173-2.34-3.095-2.836-.654-.175-.875.8-.25.97 1.508.39 1.805 1.448 2.53 2.46.364.505.886.973 1.658 1.125.643.126 1.422.03 2.437-.313v3.03C5.242 26.548 1 21.33 1 15 1 7.262 7.262 1 15 1z"></path></g>
+                </svg>
+            </a>
+            
+            <!-- n8n -->
+            <a href="https://n8n.io/" target="_blank" class="social-icon" title="n8n">
+                <svg xmlns="http://www.w3.org/2000/svg" height="1em" style="flex:none;line-height:1" viewBox="0 0 24 24" width="1em"><title>n8n</title><path clip-rule="evenodd" d="M24 8.4c0 1.325-1.102 2.4-2.462 2.4-1.146 0-2.11-.765-2.384-1.8h-3.436c-.602 0-1.115.424-1.214 1.003l-.101.592a2.38 2.38 0 01-.8 1.405c.412.354.704.844.8 1.405l.1.592A1.222 1.222 0 0015.719 15h.975c.273-1.035 1.237-1.8 2.384-1.8 1.36 0 2.461 1.075 2.461 2.4S20.436 18 19.078 18c-1.147 0-2.11-.765-2.384-1.8h-.975c-1.204 0-2.23-.848-2.428-2.005l-.101-.592a1.222 1.222 0 00-1.214-1.003H10.97c-.308.984-1.246 1.7-2.356 1.7-1.11 0-2.048-.716-2.355-1.7H4.817c-.308.984-1.246 1.7-2.355 1.7C1.102 14.3 0 13.225 0 11.9s1.102-2.4 2.462-2.4c1.183 0 2.172.815 2.408 1.9h1.337c.236-1.085 1.225-1.9 2.408-1.9 1.184 0 2.172.815 2.408 1.9h.952c.601 0 1.115-.424 1.213-1.003l.102-.592c.198-1.157 1.225-2.005 2.428-2.005h3.436c.274-1.035 1.238-1.8 2.384-1.8C22.898 6 24 7.075 24 8.4zm-1.23 0c0 .663-.552 1.2-1.232 1.2-.68 0-1.23-.537-1.23-1.2 0-.663.55-1.2 1.23-1.2.68 0 1.231.537 1.231 1.2zM2.461 13.1c.68 0 1.23-.537 1.23-1.2 0-.663-.55-1.2-1.23-1.2-.68 0-1.231.537-1.231 1.2 0 .663.55 1.2 1.23 1.2zm6.153 0c.68 0 1.231-.537 1.231-1.2 0-.663-.55-1.2-1.23-1.2-.68 0-1.231.537-1.231 1.2 0 .663.55 1.2 1.23 1.2zm10.462 3.7c.68 0 1.23-.537 1.23-1.2 0-.663-.55-1.2-1.23-1.2-.68 0-1.23.537-1.23 1.2 0 .663.55 1.2 1.23 1.2z" fill="#EA4B71" fill-rule="evenodd"/>
+                </svg>
+            </a>
+
+            <!-- Power BI -->
+            <a href="https://powerbi.microsoft.com/" target="_blank" class="social-icon" title="Power BI">
+                <svg fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1600"><mask id="prefix__a" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="200" y="0" width="1200" height="1600"><path d="M1333.25 0c36.86 0 66.75 29.885 66.75 66.75v1466.5c0 36.86-29.89 66.75-66.75 66.75H266.667c-36.819 0-66.667-29.85-66.667-66.67V866.667C200 829.848 229.848 800 266.667 800H525V466.667C525 429.848 554.848 400 591.667 400H850V66.75C850 29.885 879.885 0 916.75 0h416.5z" fill="#fff"/></mask><g mask="url(#prefix__a)"><path d="M1400 66.75v1466.5c0 36.86-29.89 66.75-66.75 66.75h-416.5c-36.865 0-66.75-29.89-66.75-66.75V66.75C850 29.885 879.885 0 916.75 0h416.5c36.87 0 66.75 29.885 66.75 66.75z" fill="url(#prefix__paint0_linear_8592:56198)"/><g filter="url(#prefix__filter0_dd_8592:56198)"><path d="M1075 466.667V1600H525V466.667C525 429.848 554.848 400 591.667 400h416.663c36.82 0 66.67 29.848 66.67 66.667z" fill="url(#prefix__paint1_linear_8592:56198)"/></g><path d="M200 866.667v666.663c0 36.82 29.848 66.67 66.667 66.67H750V866.667C750 829.848 720.152 800 683.333 800H266.667C229.848 800 200 829.848 200 866.667z" fill="url(#prefix__paint2_linear_8592:56198)"/></g><defs><linearGradient id="prefix__paint0_linear_8592:56198" x1="758.333" y1="0" x2="1447.82" y2="1507.15" gradientUnits="userSpaceOnUse"><stop stop-color="#E6AD10"/><stop offset="1" stop-color="#C87E0E"/></linearGradient><linearGradient id="prefix__paint1_linear_8592:56198" x1="524.955" y1="400" x2="1105.79" y2="1561.67" gradientUnits="userSpaceOnUse"><stop stop-color="#F6D751"/><stop offset="1" stop-color="#E6AD10"/></linearGradient><linearGradient id="prefix__paint2_linear_8592:56198" x1="199.955" y1="800" x2="519.784" y2="1581.68" gradientUnits="userSpaceOnUse"><stop stop-color="#F9E589"/><stop offset="1" stop-color="#F6D751"/></linearGradient><filter id="prefix__filter0_dd_8592:56198" x="391.667" y="300" width="816.667" height="1466.67" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feColorMatrix in="SourceAlpha" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/><feOffset dy="6.333"/><feGaussianBlur stdDeviation="6.333"/><feColorMatrix values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.2 0"/><feBlend in2="BackgroundImageFix" result="effect1_dropShadow_8592:56198"/><feColorMatrix in="SourceAlpha" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/><feOffset dy="33.333"/><feGaussianBlur stdDeviation="66.667"/><feColorMatrix values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.18 0"/><feBlend in2="effect1_dropShadow_8592:56198" result="effect2_dropShadow_8592:56198"/><feBlend in="SourceGraphic" in2="effect2_dropShadow_8592:56198" result="shape"/></filter></defs>
+                </svg>
+            </a>
+
+            <!-- Azure   -->
+            <a href="https://www.vmware.com/products/esxi-and-esx.html" target="_blank" class="social-icon" title="Azure">
+                <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="none"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g fill="#0089D6"> <path d="M7.47 12.412l3.348-.592.031-.007-1.722-2.049a291.474 291.474 0 01-1.723-2.058c0-.01 1.779-4.909 1.789-4.926a788.95 788.95 0 012.934 5.066l2.95 5.115.023.039-10.948-.001 3.317-.587zM.9 11.788c0-.003.811-1.412 1.803-3.131L4.507 5.53l2.102-1.764C7.765 2.797 8.714 2 8.717 2a.37.37 0 01-.033.085L6.4 6.981 4.16 11.789l-1.63.002c-.897.001-1.63 0-1.63-.003z"></path> </g> </g>
+                </svg>
+            </a>
+
+            <!-- WordPress -->
+            <a href="https://wordpress.org/" target="_blank" class="social-icon" title="WordPress">
+                <svg viewBox="0 0 48 48" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>Wordpress-color</title> <desc>Created with Sketch.</desc> <defs> </defs> <g id="Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"> <g id="Color-" transform="translate(-400.000000, -760.000000)" fill="#00759D"> <path d="M400,783.99925 C400,793.499047 405.520173,801.708803 413.525923,805.598425 L402.077565,774.232445 C400.747023,777.216038 400,780.519141 400,783.99925 Z M440.201556,782.788712 C440.201556,779.821619 439.135023,777.768055 438.222994,776.170505 C437.006456,774.191943 435.864921,772.517891 435.864921,770.540829 C435.864921,768.33426 437.537473,766.280696 439.895547,766.280696 C440.00205,766.280696 440.102553,766.294197 440.206056,766.300197 C435.936923,762.388075 430.247245,760 423.99955,760 C415.614288,760 408.238557,764.302134 403.946923,770.816838 C404.510941,770.834839 405.041958,770.845339 405.491972,770.845339 C408.00155,770.845339 411.888172,770.540829 411.888172,770.540829 C413.181212,770.464327 413.334217,772.366386 412.041176,772.517891 C412.041176,772.517891 410.740636,772.670896 409.29459,772.747398 L418.033864,798.743211 L423.287028,782.991218 L419.548911,772.747398 C418.25587,772.670896 417.030332,772.517891 417.030332,772.517891 C415.737292,772.441389 415.888797,770.464327 417.183337,770.540829 C417.183337,770.540829 421.146461,770.845339 423.504535,770.845339 C426.014113,770.845339 429.900734,770.540829 429.900734,770.540829 C431.195275,770.464327 431.34678,772.366386 430.053739,772.517891 C430.053739,772.517891 428.751698,772.670896 427.307153,772.747398 L435.980424,798.545205 L438.375999,790.546955 C439.411032,787.225851 440.201556,784.842276 440.201556,782.788712 Z M445.059908,772.48534 C445.163411,773.250364 445.221913,774.06939 445.221913,774.952917 C445.221913,777.387493 444.765899,780.125079 443.396356,783.549686 L436.065627,804.743848 C443.20135,800.584218 448,792.852977 448,783.9997 C448,779.82657 446.933467,775.903947 445.059908,772.48534 Z M424.421063,786.098716 L417.219338,807.022869 C419.370405,807.655889 421.644476,808.0009 423.99955,808.0009 C426.794137,808.0009 429.474721,807.517885 431.969299,806.640358 C431.906297,806.536854 431.846295,806.428851 431.798294,806.310347 L424.421063,786.098716 Z" id="Wordpress"> </path> </g> </g> </g>
+                </svg>
+            </a>
+
+            <!-- Flask Python-->
+            <a href="https://flask.palletsprojects.com/" target="_blank" class="social-icon" title="Flask">
+                <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="#ffffff" version="1.1" width="800px" height="800px" viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve" stroke="#ffffff">
+
+                <g id="SVGRepo_bgCarrier" stroke-width="0"/>
+
+                <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>
+
+                <g id="SVGRepo_iconCarrier"> <g id="e6c6b53d3c8160b22dad35a0f7103ecc"> <path display="inline" fill-rule="evenodd" clip-rule="evenodd" d="M145.973,124.482c-1.766-15.299,12.003-8.814,10.244,0.41 C153.633,127.35,148.86,125.334,145.973,124.482z M162.363,121.613c3.468-0.354,6.774-0.874,7.787-3.687 c-4.797-2.957-11.965,4.339-9.016,7.787C162.771,125.574,161.323,122.351,162.363,121.613z M116.468,131.038 c2.888-1.343,7.633-0.836,9.016-3.687c-8.596-2.994-24.076-0.784-26.638,4.917C105.399,131.863,110.879,126.663,116.468,131.038z M97.207,132.679c-1.862-0.391-2.58,1.724-1.638,2.867C97.024,135.498,97.218,134.19,97.207,132.679z M92.699,140.875 c-0.262-3.909-9.718-7.03-10.653-1.639C82.864,142.297,90.491,144.266,92.699,140.875z M76.719,137.188 c-1.953,0.091-2.957,1.142-4.099,2.048C74.106,140.102,77.398,139.792,76.719,137.188z M71.803,148.25 c7.218-0.507,9.415,6.13,15.569,5.327C88.519,146.433,73.837,136.606,71.803,148.25z M169.329,183.899 c-2.152-7.142,4.438-13.272,0.409-18.851c-5.578,0.445-10.402,26.334-2.458,26.23c5.704-0.079,7.715-15.738,8.194-20.898 C171.298,172.754,173.117,181.132,169.329,183.899z M100.896,181.034c0.124-1.083-0.568-1.347-1.639-1.233 C99.284,180.907,100.193,181.772,100.896,181.034z M120.976,192.917c0.079-2.539-0.021-4.897-2.048-5.327 c-1.543-0.175-1.451,1.281-2.46,1.641C117.031,191.397,118.175,192.988,120.976,192.917z M101.306,206.031 c7.857,0.884,13.118,6.552,20.489,6.554c-5.878-3.957-11.985-7.683-21.309-8.194C100.189,205.509,101.3,205.216,101.306,206.031z M163.183,212.177c-0.611-2.805-1.828-5.005-3.277-6.968C160.439,208.089,161.174,210.768,163.183,212.177z M118.106,221.191 c-5.143-6.882-13.337-12.879-22.537-14.343C96.868,217.841,109.088,217.92,118.106,221.191z M104.175,223.648 c-3.512-5.911-9.533-9.317-16.803-11.471C91.458,217.255,95.201,224.823,104.175,223.648z M85.324,217.914 c1.399,2.429,4.916,4.912,4.099,8.195c-3.593-1.05-5.34-3.949-9.016-4.917c1.952,2.711,9.402,14.729,13.931,14.345 c2.891-0.25,4.198-3.441,3.688-8.606C95.811,222.176,88.76,220.078,85.324,217.914z M106.223,228.568 c0.911,2.505,1.231,5.598,4.509,5.735C110.174,231.448,108.506,229.699,106.223,228.568z M103.354,229.799 c-1.528-0.167-2.403,0.324-2.457,1.636c0.459,0.09,0.638,0.454,0.818,0.819C103.025,232.203,103.521,231.327,103.354,229.799z M173.427,239.222c0.427-2.316,0.861-6.778,0-9.016C172.901,232.508,170.922,237.686,173.427,239.222z M144.743,230.616 c0.313,2.422-0.858,6.323,1.229,6.97C146.063,235.793,146.481,231.755,144.743,230.616z M164.002,240.042 c-1.189-1.054-2.895,0.539-3.688-0.408c-0.838-2.713-0.491-6.61-2.868-7.787c-0.271,0-0.546,0-0.818,0 c-3.375,6.99-3.042,22.007,2.867,25.814c1.116,1.891,1.225,4.787,4.098,4.92c2.362-1.875,2.942-5.524,3.279-9.428 C161.743,252.076,166.521,243.235,164.002,240.042z M176.297,244.547c0.505-3.628,3.607-8.905,1.229-12.7 C176.741,235.438,175.255,240.499,176.297,244.547z M104.175,247.83c0.653-1.873,0.14-5.05-1.23-6.148 C101.989,243.476,101.433,247.608,104.175,247.83z M111.55,249.467c1.655,1.077,1.782,3.68,4.099,4.098 C118.532,249.885,113.063,243.399,111.55,249.467z M181.623,257.661c0.003,1.256-1.643,2.974-0.409,4.097 C181.451,260.743,182.698,258.631,181.623,257.661z M185.31,273.643c-0.017-1.892,0.231-4.05-0.818-4.915 C184.308,270.187,183.227,273.418,185.31,273.643z M133.269,290.447c0.243,1.526,0.492,3.057,2.048,3.277 C136.322,292.318,135.58,289.828,133.269,290.447z M151.709,292.497c0.57,1.082,2.208,3.231,3.277,2.454 C154.038,294.252,152.944,291.55,151.709,292.497z M190.637,297.005c-1.151,4.879,1.574,9.324,3.689,12.293 C195.192,304.541,195.111,297.729,190.637,297.005z M200.884,328.552c0.619-1.239,0.838-5.057-0.41-5.73 C199.395,324.302,198.433,327.845,200.884,328.552z M219.32,348.226c-0.593-3.011-2.952-6.263-5.325-6.15 C214.825,345.069,214.969,348.754,219.32,348.226z M223.012,353.961c0.017,1.896-0.229,4.059,0.818,4.915 C223.883,356.917,223.855,355.029,223.012,353.961z M87.782,354.372c0.006,1.501,0.809,2.196,1.641,2.869 C89.259,355.898,89.067,354.593,87.782,354.372z M237.764,376.907c-1.009-7.727-5.073-12.404-10.244-15.977 C228.26,368.927,232.179,373.755,237.764,376.907z M303.74,417.478c-0.249-0.232-1.946-0.956-2.05,0 C302.306,417.952,303.416,418.917,303.74,417.478z M511.501,447.802c0,1.506,0,3.003,0,4.508c-0.666,1.385-0.882,3.215-1.231,4.916 c-11.395,7.318-32.803,4.624-42.209,13.935c-16.497-8.887-31.829,5.111-49.17,6.559c-2.865,0.236-6.051-0.241-9.021,0 c-10.246,0.827-20.252,3.223-30.731,4.096c-10.745,0.895-21.512,1.551-32.781,2.05c-4.101,0-8.196,0-12.293,0 c-50.825-2.669-101.077-9.506-138.508-26.228c-18.661-8.338-35.838-18.567-51.632-30.735c-15.37-11.835-31.147-24.993-42.21-39.747 c-11.778-15.711-23.562-30.989-34.012-48.352c-10.081-16.759-19.504-34.412-27.864-54.094 c-8.247-19.408-14.123-38.613-19.672-62.287c-3.627-15.484-7.455-33.015-13.932-47.534c-2.522-5.654-5.458-10.282-5.736-15.574 c0-1.227,0-2.46,0-3.687c2.021-17.212,15.407-27.203,31.143-31.965c3.94-1.191,7.771-2.329,11.474-4.508 c0.241-0.139,2.602-0.38,1.641-1.638c-7.011-1.687-12.779,8.635-20.489,5.737c-6.845-2.574-2.904-13.172,4.508-16.391 c3.46-1.503,10.33-1.894,13.521-3.688c5.502-3.092,7.999-9.625,6.968-15.572c-0.611-3.514-4.258-5.364-4.098-8.196 c0.224-3.949,7.285-7.383,10.653-9.835c4.121-2.999,8.999-6.745,8.606-11.474c-0.414-4.94-6.224-6.514-9.016-10.244 C51.027,42,50.332,33.25,57.458,29.821c7.471-3.595,21.39-1.636,22.949,7.787c1.374,8.305-4.522,11.469-2.051,17.62 c4.604,11.446,40.409-6.672,31.556,17.212c7.874,12.343,38.645,1.784,39.339,21.309c12.834,0.258,18.732,9.997,29.094,13.933 c2.777,1.054,6.084,1.054,9.016,2.048c17.476,5.94,39.132,12.312,46.305,29.095c-6.482,4.367-15.328,1.443-22.946-1.229 c-6.627-2.327-16.287-6.935-22.949-4.099c-6.605,2.813-6.252,14.098-5.327,25.405c2.46,30.102,3.903,61.151,8.194,88.104 c5.993,37.623,18.803,67.756,36.883,91.384c17.49,22.859,38.037,46.796,64.743,63.518c22.535,14.105,47.853,25.234,79.91,32.37 c4.754,1.061,10.501,3.377,13.112,2.869c3.871-0.744,12.201-12.001,15.166-14.75c7.049-6.554,16.534-15.724,26.631-7.789 c-1.372,10.925-11.161,13.433-13.523,23.362c6.071,3.863,12.509,0.366,20.082,0.815c8.812,0.524,15.569,5.577,22.951,4.508 c4.711-0.682,7.069-4.191,10.653-6.554C475.388,448.642,506.78,433.147,511.501,447.802z M422.574,417.478 c-0.174-1.322,0.541-3.543-0.818-3.684C420.574,414.393,419.406,418.16,422.574,417.478z M216.457,128.99 c4.014,2.404,7.548,5.292,11.063,8.199c2.116-6.231-3.957-10.217-11.063-9.837C216.457,127.896,216.457,128.443,216.457,128.99z M326.688,431.001c1.563,0.329,2.694,0.641,2.869-1.227C328.097,429.679,327.104,430.045,326.688,431.001z M270.136,394.938 c-0.138,1.93,3.755,1.967,4.512,1.639C274.007,395.296,272.065,393.633,270.136,394.938z M260.301,387.154 c0.682,0.69,2.407,0.324,3.688,0.411c0.137-1.501-0.458-2.278-0.819-3.281C261.016,384.048,260.421,385.361,260.301,387.154z M181.623,219.55c-1.112-0.942-1.919,0.784-2.459,0c1.335-10.166,3.48-25.818-0.819-34.418c-1.063-0.928-2.745,0.326-3.277-0.412 c2.861-6.83,4.793-21.075,3.687-29.504c-0.389-2.971-1.932-8.255-3.687-9.425c-4.41-2.936-8.423,1.576-11.476,2.459 c-1.921,0.56-4.057,0.16-6.146,0.408c-8.263,0.996-17.031,3.46-22.537,6.146c2.87,1.913,6.938,2.624,8.194,6.146 c-7.14-0.505-12.71-2.583-18.851-4.096c0.655,9.245-10.683,6.348-17.619,6.968c2.396,0.052,2.78,1.21,2.869,2.867 c0.285,5.439-17.613,11.885-23.768,7.789c-8.779,7.078,3.863,14.308,3.278,23.358c-1.726,1.279-2.523,3.485-4.098,4.913 c-8.725,0.212-17.902,1.967-16.394,11.066c-1.179-0.688-3.039-1.147-4.508-0.412c-2.23,5.745,1.514,11.981,6.559,13.116 c1.271-0.37,1.567-1.711,3.278-1.639c11.396,2.179,15.408,9.737,14.753,24.174c-0.114,2.486,0.133,5.73-1.639,7.379 c-6.467-0.443-12.463-16.405-2.05-16.8c-2.497-3.674-4.388-9.155-9.016-9.018c-5.305,0.158-7.686,8.542-11.474,11.475 c5.46,3.017,18.283,11.343,7.785,16.801c5.197,0.779,8.097,2.84,10.244,5.734c3.578,4.832,3.464,12.072,6.148,15.985 c5.431,7.922,8.298-7.106,14.75-0.823c1.524,0.524-0.671-1.48-0.819-1.635c-5.535-5.976-13.977-10.874-17.21-18.031 c2.485-1.139,5.816,0.104,8.194,0.408c0.94-4.814-2.405-10.262-1.229-13.936c0.847-2.634,2.41-1.474,4.099-2.456 c0.993-0.578,0.216-2.73,2.05-2.048c-0.011,5.626-3.401,15.094,0.407,19.259c5.561,0.998,7.167-8.565,11.886-8.605 c2.636-0.023,5.127,4.617,6.965,6.966c2.208,2.819,5.209,6.283,4.508,9.423c-1.476,6.62-12.594,1.58-16.391-1.23 c2.314,9.186,16.553,10.612,17.21,22.543c0.075,1.331-0.597,3.031-0.409,4.504c0.805,6.296,6.676,10.975,12.702,6.97 c0.886,2.258,1.002,5.285,3.281,6.146c1.996-1.688,1.287-6.089,2.457-8.608c7.15,1.497,10.883,4.94,13.112,10.654 c1.104,2.827,0.819,8.067,5.327,8.196c0.69-6.986-4.784-11.315-5.735-18.031c3.673,5.926,16.922,12.338,16.392,21.72 c-0.352,6.188-7.706,6.861-14.753,7.785c6.716,2.308,9.529,9.83,16.801,12.292c1.954,0.666,4.464,0.096,6.556,0.823 c5.321,1.851,13.829,12.759,11.476,19.67c-11.338,5.714-20.184-9.73-32.784-9.423c5.313,6.774,14.004,9.028,21.309,12.293 c7.862,3.51,15.734,7.106,23.358,10.653c17.972,8.359,30.447,19.296,42.209,33.193c-8.161,4.45-32.897-2.952-18.031-8.2 c-5.171-0.175-10.644-3.418-15.164-1.634c2.396,15.636,22.968,13.095,38.522,15.569c-1.416,2.682-3.412,4.786-4.919,7.377 c1.199,0.707,2.856,0.965,4.919,0.819c-0.996,1.597-3.589,1.601-3.69,4.096c1.992,2.653,5.935,3.356,8.606,5.327 c10.531-7.552,11.712,9.581,18.44,9.835c6.358,0.237,7.577-8.899,13.936-9.835c-1.598,3.323-4.725,5.111-6.146,8.608 c6.226-1.505,8.001-4.857,13.107-6.15c18.298-4.629,33.298,10.612,48.355,12.297c5.414,0.603,10.796,3.643,15.573,4.508 c6.176,1.114,9.973-0.919,14.751-3.277c-7.277-6.795-23.986-4.149-29.912-12.297c0.229-1.409,1.193-2.083,2.05-2.865 c-19.18,4.213-31.256-7.281-39.34-18.031c-23.662-6.112-44.421-15.133-54.504-34.831c-0.484-1.855,1.817-0.915,1.233-2.87 c-8.319-9.257-16.634-18.655-23.358-29.505c-2.324-3.746-3.915-8.454-6.558-11.473c-1.674-1.913-4.483-2.966-6.146-4.92 c-1.821-2.142-2.069-4.824-4.92-5.734c-1.096,1.634-0.361,5.098-1.227,6.965c-1.971-7.913-6.362-15.428-14.752-15.573 c-0.156-5.755,4.493-6.703,6.965-9.835c-3.254-3.913-4.038-8.841-5.736-14.75c-4.128-14.359-7.539-29.359-11.066-42.62 c-4.674,1.745-5.913,6.926-8.194,11.065c0.225-5.92,0.502-11.792,3.689-14.755c1.457,0.183,1.617,1.664,2.457,2.46 c0.77-2.792,3.412-5.396,2.048-9.014c-1.058-1.634-4.151-0.872-4.915-0.819C182.414,234.271,184.112,225.289,181.623,219.55z M346.357,462.557c3.543-1.514,6.732-3.377,8.192-6.97C350.698,456.552,345.268,458.007,346.357,462.557z M346.765,454.36 c-2.37,1.313-5.036,2.341-6.554,4.508C343.608,459.071,347.588,455.661,346.765,454.36z M334.064,460.506 c2.32-0.619,4.803-3.015,4.508-4.919C335.878,455.857,331.711,457.778,334.064,460.506z M335.703,451.079 c-3.688-1.165-6.699,1.722-6.97,5.331C332.019,455.595,334.243,453.72,335.703,451.079z M324.226,451.902 c-3.602,0.628-6.296,2.162-7.377,5.323C321.252,458.972,323.506,455.188,324.226,451.902z M318.491,462.557 c1.015,0.058,1.987,0.074,2.05-0.823C319.926,461.084,318.204,461.134,318.491,462.557z M325.049,444.933 c-5.734-0.44-12.592,3.281-9.016,8.196C319.851,451.208,323.718,449.341,325.049,444.933z M296.771,452.722 c3.581,0.503,4.517-3.593,6.97-2.874c1.423,0.898,0.558,4.088,2.865,4.101c5.36-1.09,7.29-8.404,4.097-13.523 C303.479,441.697,296.87,445.673,296.771,452.722z M298.409,442.067c-2.175,1.102-4.491,2.059-5.734,4.096 C295.356,446.047,299.349,443.09,298.409,442.067z M286.94,444.117c0.229,1.09-1.688,2.084-0.416,2.865 C286.865,446.467,289.02,444.441,286.94,444.117z M279.563,453.948c-0.129,0.558-0.586,0.782-0.407,1.639c0.541,0,1.09,0,1.639,0 C280.906,454.514,280.64,453.827,279.563,453.948z M273.417,451.902c-2.071,0.116-2.854,1.518-2.87,3.685 C272.331,455.191,273.957,454.63,273.417,451.902z M232.024,431.001c-2.525-0.111-3.295,0.279-0.407,0.824 c2.751,0.507,7.604,0.773,9.426,0C238.88,431.8,233.291,431.06,232.024,431.001z M244.321,424.447 c-2.144-1.63-6.454-0.449-8.605,0.408C236.957,428.265,243.051,426.751,244.321,424.447z M231.21,455.179 c10.22,5.356,24.292,11.203,38.926,9.424C259.502,459.396,243.688,457.175,231.21,455.179z M216.046,450.671 c0.979,1.344,3.291,1.352,4.915,2.051C223.986,449.798,217.337,448.151,216.046,450.671z M177.525,417.478 c-2.766,0.241-5.776,0.233-6.556,2.462C173.604,420.917,177.417,420.31,177.525,417.478z M169.738,428.132 c0.963,0.873,2.734,1.913,3.279,0C172.593,427.699,170.092,427.288,169.738,428.132z M174.656,393.3 c0.372-1.713-2.891-2.361-3.277-0.818C172.277,392.946,173.055,393.537,174.656,393.3z M179.985,407.231 c-0.02-0.562,0.193-0.898,0.409-1.227c-1.221-1.261-3.69-1.485-5.738-0.819C174.984,407.156,178.266,407.979,179.985,407.231z M180.395,433.463c0.524,0.558,1.934,0.558,2.458,0c0.193-1.289-0.512-1.676-1.229-2.054 C181.256,432.137,180.634,432.606,180.395,433.463z M193.099,386.335c-1.335-3.859-5.688-2.841-8.607-4.097 c-4.691-2.021-8.696-6.845-14.753-6.965c-0.272,0-0.547,0-0.817,0C174.19,381.481,181.162,388.152,193.099,386.335z M171.788,371.177c-3.825-2.599-8.015-4.832-13.523-5.738C160.016,369.834,166.832,371.348,171.788,371.177z M184.491,390.431 c2.873,3.003,6.479,5.273,12.704,4.916C194.802,392.136,189.084,390.077,184.491,390.431z M200.063,408.874 c-4.219-2.924-10.855-7.668-16.391-6.559C186.874,406.491,193.311,409.618,200.063,408.874z M184.491,424.447 c-0.099,0.583-0.674,0.687-0.819,1.223C184.682,426.988,186.202,424.722,184.491,424.447z M193.916,436.74 c0.348,1.563,1.853,1.971,3.279,2.458c0.555-0.948,1.646-1.36,1.229-3.277C197.428,435.322,193.846,434.977,193.916,436.74z M201.703,418.709c-1.269-0.777-5.897-1.646-6.968,0C196.723,419.516,200.628,421.604,201.703,418.709z M202.932,404.773 c0.41-3.048-3.038-3.061-4.508-2.05C198.562,404.773,201.274,404.25,202.932,404.773z M207.439,382.646 c-1.851-2.795-6.992-2.296-10.654-3.277c-2.682-3.368-9.095-4.591-14.752-3.688C188.512,379.997,195.881,383.415,207.439,382.646z M206.62,421.985c1.76,1.519,4.519,2.038,6.966,2.87c0.131-0.965,0.646-1.539,0.409-2.87 C212.802,420.609,207.625,419.898,206.62,421.985z M171.788,355.599c0.41-1.912-0.715-2.287-2.459-2.046 C168.711,355.674,170.755,355.129,171.788,355.599z M181.623,360.519c-1.197-0.304-0.794-2.208-2.459-2.05 C177.654,359.854,180.374,361.962,181.623,360.519z M153.348,363.388c-1.36-3.007-4.425-4.316-6.556-6.558 c3.996-5.789-4.92-8.159-6.557-12.293c-0.019-1.247,0.865-1.593,1.229-2.462c-3.443-2.017-7.419-3.505-9.426-6.961 c1.585-1.147,5.81,0.341,7.375-0.823c-2.482-1.069-5.162-1.938-6.146-4.508c1.437-3.344,7.279-2.279,8.605-5.735 c-7.059-1.559-14.072-5.31-21.72-4.919c0.087,2.919,2.685,3.326,3.688,5.327c-2.267-1.007-4.101-2.458-7.375-2.458 c-0.245,2.021,1.064,2.487,0.821,4.508c-2.235,0.183-3.368-0.731-5.739-0.407c1.69,3.771,6.024,4.902,7.378,9.016 c-1.676,0.424-3.951-0.666-4.508,0c4.326,3.593,10.644,7.381,13.111,11.469c-4.025-0.748-6.329-3.227-10.242-4.096 c3.276,6.487,11.253,7.839,17.21,11.065C140.594,356.854,146.058,362.178,153.348,363.388z M144.332,368.304 c1.713,0.936,5.123,3.908,7.377,1.643C149.809,369.105,146.82,367.193,144.332,368.304z M141.055,366.253 c-1.153-1.867-7.036-2.861-8.604-1.639C135.125,365.384,137.645,367.459,141.055,366.253z M133.678,367.484 c-0.129,0.557-0.582,0.781-0.409,1.643c0.721-0.237,2.407,0.49,2.459-0.412C135.092,368.258,134.873,367.384,133.678,367.484z M128.351,312.982c-1.118-3.851-2.611-8.071-5.736-11.062c-1.683-1.613-3.313-1.58-4.508-3.693 c-3.167-5.572-1.649-13.439-5.737-19.254c-0.967-0.315-2.832-0.811-3.688,0c0.077,2.687,6.313,9.058,2.051,12.293 c-9.424,0.374-13.052-7.128-22.128-5.739c-2.044,5.294,5.182,8.014,3.276,11.886C104.917,301.597,115.27,310.662,128.351,312.982z M98.846,325.275c2.408,1.834,5.889,4.766,9.016,4.508C105.385,328.028,103.106,323.895,98.846,325.275z M94.338,321.591 c-1.063-3.307-2.906-5.835-6.966-6.146C88.198,318.987,92.047,319.512,94.338,321.591z M87.372,332.245 c2.194,1.501,4.373,5.181,6.557,5.327C92.332,335.48,90.386,331.559,87.372,332.245z M90.242,303.967 c0.212-0.607,0.604-1.031,0.819-1.639c-1.051-1.447-3.642-0.657-4.097,0.823C87.77,303.709,89.304,303.543,90.242,303.967z M153.759,320.359c-0.058-3.526-3.975-5.572-6.967-3.685C147.74,319.278,150.597,319.969,153.759,320.359z M115.236,266.682 c0.069-0.678-2.523-0.678-2.457,0C113.341,266.806,115.251,268.532,115.236,266.682z M99.258,265.039c-0.547,0-1.094,0-1.641,0 c-0.563,0.527-0.405,1.784-0.41,2.865c0.749,0.112,2.298,1.48,2.87,0.415C99.063,267.962,100.195,265.467,99.258,265.039z M68.521,264.627c1.358,3.09,6.855,2.861,7.787-0.407C73.976,263.317,70.541,263.945,68.521,264.627z M69.753,253.153 c-1.585-0.079-3.021-0.013-4.101,0.412C65.971,255.353,69.742,255.035,69.753,253.153z M73.439,187.18 c-2.106,0.973-6.498-0.975-8.604,0c1.865,7.383,15.688,3.408,14.753-2.46c-0.794-4.978-13.939-3.745-18.441-3.277 C64.636,183.963,70.182,184.427,73.439,187.18z M57.049,194.965c0.771,1.142,2.89,0.934,4.098,1.639 c0.237-0.854,1.017-1.168,0.819-2.458C60.891,193.578,57.023,193.131,57.049,194.965z M77.949,193.327 c-0.221,0.894-0.994,2.651,0.407,2.869C79.332,195.508,79.128,193.921,77.949,193.327z M89.423,168.739 c-0.108-1.198,0.925-1.256,0.819-2.458c-1.666-0.163-2.857,0.149-2.87,1.638C88.152,168.097,88.401,168.802,89.423,168.739z M89.013,77.767c-1.632,10,7.378,22.097,18.029,18.439c0.497-3.774-1.225-5.329-1.229-8.604c2.718-0.659,4.318,1.951,5.736,1.229 C107.563,81.618,96.96,81.021,89.013,77.767z M84.503,68.342c3.602,0.713,9.255,0.352,10.656-2.459 C92.438,64.065,84.274,63.578,84.503,68.342z M74.668,39.656c0.788-7.959-8.938-12.357-14.75-6.965 c-3.633,3.368-5.211,11.502,0.409,14.343c-0.638-2.096-2.501-2.963-2.048-6.146C62.55,38.446,70.381,42.079,74.668,39.656z M71.803,65.882c1.042-0.595,2.607-0.666,2.458-2.458C73.001,63.551,70.854,64.909,71.803,65.882z M63.195,96.206 c5.11,0.121,8.963-2.761,13.933-2.867c4.302-0.091,8.402,1.189,13.523,0.819C86.994,83.425,69.225,92.798,63.195,96.206z M55.41,115.057c9.669-1.229,23.14-7.591,36.061-6.146c4.874,0.544,9.143,3.287,11.883,5.327c-1.397-1.491-3.052-7.61,0-8.604 c6.725,1.281,6.949,13.987,15.162,12.293c4.184-0.863,5.458-8.979,3.279-13.933c3.127,2.2,4.738,5.916,9.016,6.967 c-0.976-3.942-3.813-6.023-5.736-9.016c1.208-1.522,2.79-2.674,2.457-5.739c-11.727-1.127-22.136,5.203-33.193,7.377 c-8.581,1.69-14.967,3.364-22.535,5.327C66.114,110.385,59.783,111.42,55.41,115.057z M20.988,199.884 c-0.563,0.522-0.714,2.448,0.409,2.458C21.734,202.045,22.497,199.506,20.988,199.884z M35.328,151.12 c-17.969,2.851,1.184,21.961,11.886,17.212c1.355-2.081,0.934-3.988,0.819-6.97c6.235,0.611,10.926-2.426,16.393-1.227 c0.882,1.905-0.786,3.518-1.23,5.325c18.593-1.179,27.799-15.788,47.943-18.029c2.503-0.279,5.356,0.164,8.198,0 c8.483-0.495,17.88-2.067,26.636-3.689c8.591-1.588,16.446-4.747,23.766-6.554c9.187-2.271,23.163-8.271,21.311-20.491 c-0.212-1.391-1.177-2.641-2.05-4.098c-48.834-4.722-85.346,14.422-123.754,22.129c-4.614,0.925-10.224,0.31-13.934,4.096 c1.342,3.302,6.058,3.231,8.194,5.737c-1.068,1.252-3.709,0.932-4.096,2.87c0.904,3.466,6.042,2.694,6.556,6.558 c-8.157,5.75-25.261-1.584-21.309-13.114c-12.325,2.701-30.27,5.385-30.323,19.26c-0.025,6.115,3.62,11.771,7.784,15.162 C15.297,162.387,20.092,143.297,35.328,151.12z M50.492,227.749c0.373-2.775-4.188-4.718-5.736-2.867 C46.266,226.239,48.63,226.74,50.492,227.749z M36.149,233.076c2.898,10.076,3.841,22.113,11.474,27.456 C46.474,248.704,42.277,239.925,36.149,233.076z M53.36,222.422c1.276-5.785-7.211-8.051-7.785-4.099 C45.074,221.765,50.501,221.365,53.36,222.422z M55,211.356c-1.85-2.023-6.493-3.277-9.834-2.458 C46.345,211.799,53.599,216.092,55,211.356z M50.083,193.327c1.851-1.154,3.815-2.198,4.096-4.92 c-2.378-1.78-8.071-2.031-8.604,0.824C45.172,191.389,48.064,192.264,50.083,193.327z M55.41,200.292 c0.179-1.408-0.162-2.295-0.41-3.279c-2.102-0.052-3.083,1.015-3.278,2.871C52.742,200.228,53.917,200.419,55.41,200.292z M26.725,198.244c-0.316-1.05-0.41-2.323-1.229-2.868C24.477,196.479,24.438,198.46,26.725,198.244z M30.823,170.38 c-1.839-0.717-4.561,0.048-5.327,1.638c0.86,0.776,2.098,1.181,3.278,1.637C29.188,172.299,31.041,172.374,30.823,170.38z M35.328,223.241c-1.06-2.354-1.193-5.635-3.276-6.965C26.441,217.074,32,225.135,35.328,223.241z M43.115,267.496 c4.001,9.673,8.224,20.128,16.803,24.586c-6.415-7.137-7.929-18.946-12.295-27.455c-1.51-2.936-3.919-5.219-5.327-8.193 c-3.313-7.003-4.84-15.174-11.473-18.441C33.437,248.298,39.036,257.624,43.115,267.496z M155.808,421.167 c-2.48-8.446-9.137-12.722-18.441-14.343c-2.3-5.485-8.938-6.629-10.244-13.112c-0.212-1.331,2.538-1.801,1.641-2.458 c-12.472,2.362-12.912-10.857-18.851-16.393c-14.987,0.271-12.199-18.272-20.489-27.862c-2.368-2.744-4.716-3.377-7.377-6.146 c-4.095-12.691-14.782-19.129-20.899-30.323c-5.433-9.947-6.576-21.167-15.571-28.278c7.117,24.095,22.364,44.463,36.061,64.748 c10.964,16.23,18.42,31.688,30.733,44.663c4.184,4.403,8.908,7.352,13.934,11.473C134.854,410.146,140.741,423.15,155.808,421.167z M154.167,393.3c-0.441-1.755-3.602-2.939-5.327-2.046C150.429,392.128,152.175,392.835,154.167,393.3z M169.329,382.646 c-2.776-3.235-8.588-4.467-13.932-6.555c-6.629-2.595-16.087-5.052-20.898-2.05c0.484,4.021,3.687,5.327,5.736,7.785 c5.693,0.877,8.951,3.655,14.341,4.096C160.929,386.447,166.862,386.164,169.329,382.646z M364.796,476.08 c-12.4-5.655-30.586,0.707-43.848-2.462c-2.503-0.599-4.716-2.32-6.965-2.458c-2.237-0.137-4.841,1.044-6.966,1.231 c-11.357,1.01-21.725-0.112-32.37-1.643c-7.469-1.073-15.424-1.493-22.132-3.277c-6.425-1.705-13.07-5.639-19.67-8.196 c-6.697-2.591-13.669-5.173-20.079-7.785c-12.646-5.152-26.086-14.068-39.34-17.619c8.941,9.498,24.334,12.55,34.834,20.489 c-14.838-4.15-26.034-11.939-39.34-17.62c10.367,9.282,24.833,14.904,39.34,20.896c14.447,5.972,30.146,11.024,47.122,13.523 C289.103,476.126,328.654,483.503,364.796,476.08z M375.45,474.849c-2.104,0.084-4.725-0.354-4.915,1.639 C372.318,478.018,375.317,477.859,375.45,474.849z M397.578,426.493c0.582,3.028,4.978,2.125,4.512-1.23 C399.856,424.946,398.888,425.895,397.578,426.493z M431.59,447.802c-11.016-0.266-24.605-4.071-36.063-3.685 c-4.396,0.146-9.739,1.198-11.062,5.73c3.381,1.372,7.003,0.549,11.062,0.416C408.818,449.814,425.058,455.786,431.59,447.802z M442.656,446.982c-1.917-0.004-2.482,1.348-2.869,2.865c0.527,0.565,1.779,0.412,2.869,0.416 C442.461,448.45,443.218,448.222,442.656,446.982z M466.834,445.345c-2-0.304-2.745,2.183-2.05,3.28 c1.289,0.195,1.601-0.586,2.461-0.823C467.541,446.55,466.538,446.596,466.834,445.345z M500.843,447.802 c-8.389-0.894-18.186-0.341-25.813,0.823C479.521,452.854,495.652,450.155,500.843,447.802z M106.633,198.651 c4.042,2.246,7.772,6.978,13.114,6.558c-1.443-1.971-3.489-3.341-4.92-5.325c1.522-0.12,2.815-0.463,3.279-1.64 c-4.984-3.487-11.376-7.746-13.932-12.297C105.861,189.216,108.443,194.424,106.633,198.651z M159.086,201.933 c-0.877-0.898-0.482-3.073-1.641-3.688C157.184,200.028,158.338,202.521,159.086,201.933z M121.385,237.586 c0.628,6.747,4.94,9.806,5.327,16.8c-4.79-5.454-7.464-13.027-10.654-20.083c-0.313,8.535,2.267,13.823,4.508,19.674 c1.725,4.496,3.342,9.773,7.785,11.063c2.075-0.387,1.959-2.966,4.101-3.281c2.278,0.328,3.464,3.904,4.915,3.692 c-1.094-1.23-1.435-3.21-1.639-5.327c0.396-1.518,2.566-1.26,3.277-2.462C134.884,249.219,128.977,242.557,121.385,237.586z"> </path> </g> </g>
+
+                </svg>
+            </a>
+
+            <!-- FastAPI -->
+            <a href="https://fastapi.tiangolo.com/" target="_blank" class="social-icon" title="FastAPI">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="#ffffff" width="800px" height="800px" viewBox="0 0 24 24" role="img" stroke="#ffffff">
+
+                <g id="SVGRepo_bgCarrier" stroke-width="0"/>
+
+                <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>
+
+                <g id="SVGRepo_iconCarrier">
+
+                <path d="M12 0C5.375 0 0 5.375 0 12c0 6.627 5.375 12 12 12 6.626 0 12-5.373 12-12 0-6.625-5.373-12-12-12zm-.624 21.62v-7.528H7.19L13.203 2.38v7.528h4.029L11.376 21.62z"/>
+
+                </g>
+
+                </svg>
+            </a>
+
+            <!-- Node.js -->
+            <a href="https://nodejs.org/" target="_blank" class="social-icon" title="Node.js">
+                <svg viewBox="0 -99 512 512" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <defs> <linearGradient x1="68.188%" y1="17.487%" x2="27.823%" y2="89.755%" id="b"> <stop stop-color="#41873F" offset="0%"></stop> <stop stop-color="#418B3D" offset="32.88%"></stop> <stop stop-color="#419637" offset="63.52%"></stop> <stop stop-color="#3FA92D" offset="93.19%"></stop> <stop stop-color="#3FAE2A" offset="100%"></stop> </linearGradient> <path id="a" d="M57.903 1.85a5.957 5.957 0 0 0-5.894 0L3.352 29.933c-1.85 1.04-2.89 3.005-2.89 5.085v56.286c0 2.08 1.156 4.045 2.89 5.085l48.657 28.085a5.957 5.957 0 0 0 5.894 0l48.658-28.085c1.849-1.04 2.89-3.005 2.89-5.085V35.019c0-2.08-1.157-4.045-2.89-5.085L57.903 1.85z"></path> <linearGradient x1="43.277%" y1="55.169%" x2="159.245%" y2="-18.306%" id="d"> <stop stop-color="#41873F" offset="13.76%"></stop> <stop stop-color="#54A044" offset="40.32%"></stop> <stop stop-color="#66B848" offset="71.36%"></stop> <stop stop-color="#6CC04A" offset="90.81%"></stop> </linearGradient> <linearGradient x1="-4413.77%" y1="13.43%" x2="5327.93%" y2="13.43%" id="e"> <stop stop-color="#6CC04A" offset="9.192%"></stop> <stop stop-color="#66B848" offset="28.64%"></stop> <stop stop-color="#54A044" offset="59.68%"></stop> <stop stop-color="#41873F" offset="86.24%"></stop> </linearGradient> <linearGradient x1="-4.389%" y1="49.997%" x2="101.499%" y2="49.997%" id="f"> <stop stop-color="#6CC04A" offset="9.192%"></stop> <stop stop-color="#66B848" offset="28.64%"></stop> <stop stop-color="#54A044" offset="59.68%"></stop> <stop stop-color="#41873F" offset="86.24%"></stop> </linearGradient> <linearGradient x1="-9713.77%" y1="36.21%" x2="27.93%" y2="36.21%" id="g"> <stop stop-color="#6CC04A" offset="9.192%"></stop> <stop stop-color="#66B848" offset="28.64%"></stop> <stop stop-color="#54A044" offset="59.68%"></stop> <stop stop-color="#41873F" offset="86.24%"></stop> </linearGradient> <linearGradient x1="-103.861%" y1="50.275%" x2="100.797%" y2="50.275%" id="h"> <stop stop-color="#6CC04A" offset="9.192%"></stop> <stop stop-color="#66B848" offset="28.64%"></stop> <stop stop-color="#54A044" offset="59.68%"></stop> <stop stop-color="#41873F" offset="86.24%"></stop> </linearGradient> <linearGradient x1="130.613%" y1="-211.069%" x2="4.393%" y2="201.605%" id="i"> <stop stop-color="#41873F" offset="0%"></stop> <stop stop-color="#418B3D" offset="32.88%"></stop> <stop stop-color="#419637" offset="63.52%"></stop> <stop stop-color="#3FA92D" offset="93.19%"></stop> <stop stop-color="#3FAE2A" offset="100%"></stop> </linearGradient> </defs> <g fill="none"> <path d="M253.11 313.094c-1.733 0-3.351-.462-4.854-1.271l-15.371-9.13c-2.312-1.272-1.156-1.734-.462-1.965 3.12-1.04 3.698-1.272 6.934-3.12.347-.232.81-.116 1.156.115l11.789 7.05c.462.231 1.04.231 1.386 0l46.115-26.698c.462-.231.694-.694.694-1.271v-53.28c0-.579-.232-1.04-.694-1.272l-46.115-26.582c-.462-.232-1.04-.232-1.386 0l-46.115 26.582c-.462.231-.694.809-.694 1.271v53.28c0 .463.232 1.04.694 1.272l12.598 7.281c6.819 3.467 11.095-.578 11.095-4.623v-52.587c0-.693.578-1.387 1.387-1.387h5.894c.694 0 1.387.578 1.387 1.387v52.587c0 9.13-4.97 14.447-13.638 14.447-2.658 0-4.738 0-10.633-2.89l-12.135-6.934c-3.005-1.733-4.854-4.97-4.854-8.437v-53.28c0-3.467 1.849-6.704 4.854-8.437l46.114-26.698c2.89-1.618 6.82-1.618 9.709 0l46.114 26.698c3.005 1.733 4.855 4.97 4.855 8.437v53.28c0 3.467-1.85 6.704-4.855 8.437l-46.114 26.698c-1.503.694-3.236 1.04-4.854 1.04zm14.216-36.637c-20.225 0-24.386-9.246-24.386-17.105 0-.694.578-1.387 1.387-1.387h6.01c.693 0 1.271.462 1.271 1.156.925 6.125 3.583 9.13 15.834 9.13 9.708 0 13.87-2.196 13.87-7.397 0-3.005-1.157-5.2-16.297-6.703-12.598-1.272-20.457-4.045-20.457-14.1 0-9.362 7.86-14.91 21.035-14.91 14.793 0 22.075 5.086 23 16.18 0 .348-.116.694-.347 1.041-.232.231-.578.462-.925.462h-6.01c-.578 0-1.156-.462-1.271-1.04-1.387-6.356-4.97-8.437-14.447-8.437-10.633 0-11.905 3.699-11.905 6.472 0 3.352 1.503 4.392 15.834 6.241 14.216 1.85 20.92 4.508 20.92 14.447-.116 10.171-8.437 15.95-23.116 15.95z" fill="#539E43"></path> <path d="M110.028 104.712c0-2.08-1.156-4.046-3.005-5.086l-49.004-28.2c-.81-.463-1.734-.694-2.658-.81h-.463c-.924 0-1.849.347-2.658.81l-49.004 28.2c-1.85 1.04-3.005 3.005-3.005 5.086l.116 75.817c0 1.04.578 2.08 1.502 2.543.925.578 2.08.578 2.89 0l29.125-16.643c1.849-1.04 3.005-3.005 3.005-5.085v-35.482c0-2.08 1.155-4.045 3.005-5.085l12.366-7.166c.925-.578 1.965-.81 3.005-.81 1.04 0 2.08.232 2.89.81l12.366 7.166c1.85 1.04 3.005 3.004 3.005 5.085v35.482c0 2.08 1.156 4.045 3.005 5.085l29.125 16.643c.925.578 2.08.578 3.005 0 .925-.463 1.503-1.503 1.503-2.543l-.116-75.817zM345.571.347c-.924-.463-2.08-.463-2.89 0-.924.578-1.502 1.502-1.502 2.542v75.125c0 .693-.346 1.386-1.04 1.849-.693.346-1.387.346-2.08 0l-12.251-7.05a5.957 5.957 0 0 0-5.895 0l-49.004 28.316c-1.849 1.04-3.005 3.005-3.005 5.085v56.516c0 2.08 1.156 4.046 3.005 5.086l49.004 28.316a5.957 5.957 0 0 0 5.895 0l49.004-28.316c1.849-1.04 3.005-3.005 3.005-5.086V21.844c0-2.196-1.156-4.16-3.005-5.201L345.572.347zm-4.507 143.776c0 .578-.231 1.04-.694 1.271l-16.758 9.708a1.714 1.714 0 0 1-1.503 0l-16.758-9.708c-.463-.231-.694-.809-.694-1.271v-19.417c0-.578.231-1.04.694-1.271l16.758-9.709a1.714 1.714 0 0 1 1.503 0l16.758 9.709c.463.23.694.809.694 1.271v19.417zM508.648 124.244c1.85-1.04 2.89-3.005 2.89-5.086v-13.753c0-2.08-1.156-4.045-2.89-5.085l-48.657-28.2a5.957 5.957 0 0 0-5.894 0l-49.004 28.315c-1.85 1.04-3.005 3.005-3.005 5.086v56.516c0 2.08 1.155 4.045 3.005 5.085l48.657 27.738c1.85 1.04 4.045 1.04 5.779 0L489 178.45c.925-.463 1.503-1.503 1.503-2.543 0-1.04-.578-2.08-1.503-2.543l-49.235-28.316c-.924-.577-1.502-1.502-1.502-2.542v-17.683c0-1.04.578-2.08 1.502-2.543l15.372-8.784a2.821 2.821 0 0 1 3.005 0l15.371 8.784c.925.578 1.503 1.502 1.503 2.543v13.869c0 1.04.578 2.08 1.502 2.542.925.578 2.08.578 3.005 0l29.125-16.99z" fill="#333"></path> <path d="M456.293 121.586a1.05 1.05 0 0 1 1.155 0l9.362 5.432c.347.23.578.577.578 1.04v10.864c0 .462-.231.809-.578 1.04l-9.362 5.432a1.05 1.05 0 0 1-1.155 0l-9.362-5.432c-.347-.231-.578-.578-.578-1.04v-10.864c0-.463.231-.81.578-1.04l9.362-5.432z" fill="#539E43"></path> <g transform="translate(134.068 70.501)"> <mask id="c" fill="#ffffff"> <use xlink:href="#a"></use> </mask> <use fill="url(#b)" xlink:href="#a"></use> <g mask="url(#c)"> <path d="M51.893 1.85L3.121 29.933C1.27 30.974 0 32.94 0 35.02v56.286c0 1.387.578 2.658 1.502 3.698L56.285 1.156c-1.387-.231-3.005-.116-4.392.693zM56.632 125.053c.462-.116.925-.347 1.387-.578l48.773-28.085c1.85-1.04 3.005-3.005 3.005-5.085V35.019c0-1.502-.694-3.005-1.734-4.045l-51.43 94.079z"></path> <path d="M106.676 29.934L57.788 1.85a8.025 8.025 0 0 0-1.503-.578L1.502 95.12a6.082 6.082 0 0 0 1.619 1.387l48.888 28.085c1.387.809 3.005 1.04 4.507.577l51.432-94.078c-.347-.462-.81-.81-1.272-1.156z" fill="url(#d)"></path> </g> <g mask="url(#c)"> <path d="M109.797 91.305V35.019c0-2.08-1.271-4.045-3.12-5.085L57.786 1.85a5.106 5.106 0 0 0-1.848-.693l53.511 91.42c.231-.347.347-.809.347-1.271zM3.12 29.934C1.272 30.974 0 32.94 0 35.02v56.286c0 2.08 1.387 4.045 3.12 5.085l48.889 28.085c1.156.693 2.427.925 3.814.693L3.467 29.818l-.346.116z"></path> <path fill="url(#e)" fill-rule="evenodd" d="M50.391.809l-.693.347h.924l-.231-.347z" transform="translate(0 -9.246)"></path> <path d="M106.792 105.636c1.387-.809 2.427-2.196 2.89-3.698L56.053 10.402c-1.387-.231-2.89-.116-4.16.693L3.351 39.065l52.355 95.465a8.057 8.057 0 0 0 2.196-.693l48.889-28.2z" fill="url(#f)" fill-rule="evenodd" transform="translate(0 -9.246)"></path> <path fill="url(#g)" fill-rule="evenodd" d="M111.3 104.712l-.347-.578v.809l.346-.231z" transform="translate(0 -9.246)"></path> <path d="M106.792 105.636l-48.773 28.085a6.973 6.973 0 0 1-2.196.693l.925 1.734 54.089-31.32v-.694l-1.387-2.312c-.231 1.618-1.271 3.005-2.658 3.814z" fill="url(#h)" fill-rule="evenodd" transform="translate(0 -9.246)"></path> <path d="M106.792 105.636l-48.773 28.085a6.973 6.973 0 0 1-2.196.693l.925 1.734 54.089-31.32v-.694l-1.387-2.312c-.231 1.618-1.271 3.005-2.658 3.814z" fill="url(#i)" fill-rule="evenodd" transform="translate(0 -9.246)"></path> </g> </g> </g> </g>
+                </svg>
+            </a>
+
+            <!-- React -->
+            <a href="https://react.dev/" target="_blank" class="social-icon" title="React.js">
+                <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M18.6789 15.9759C18.6789 14.5415 17.4796 13.3785 16 13.3785C14.5206 13.3785 13.3211 14.5415 13.3211 15.9759C13.3211 17.4105 14.5206 18.5734 16 18.5734C17.4796 18.5734 18.6789 17.4105 18.6789 15.9759Z" fill="#53C1DE"></path> <path fill-rule="evenodd" clip-rule="evenodd" d="M24.7004 11.1537C25.2661 8.92478 25.9772 4.79148 23.4704 3.39016C20.9753 1.99495 17.7284 4.66843 16.0139 6.27318C14.3044 4.68442 10.9663 2.02237 8.46163 3.42814C5.96751 4.82803 6.73664 8.8928 7.3149 11.1357C4.98831 11.7764 1 13.1564 1 15.9759C1 18.7874 4.98416 20.2888 7.29698 20.9289C6.71658 23.1842 5.98596 27.1909 8.48327 28.5877C10.9973 29.9932 14.325 27.3945 16.0554 25.7722C17.7809 27.3864 20.9966 30.0021 23.4922 28.6014C25.9956 27.1963 25.3436 23.1184 24.7653 20.8625C27.0073 20.221 31 18.7523 31 15.9759C31 13.1835 26.9903 11.7923 24.7004 11.1537ZM24.4162 19.667C24.0365 18.5016 23.524 17.2623 22.8971 15.9821C23.4955 14.7321 23.9881 13.5088 24.3572 12.3509C26.0359 12.8228 29.7185 13.9013 29.7185 15.9759C29.7185 18.07 26.1846 19.1587 24.4162 19.667ZM22.85 27.526C20.988 28.571 18.2221 26.0696 16.9478 24.8809C17.7932 23.9844 18.638 22.9422 19.4625 21.7849C20.9129 21.6602 22.283 21.4562 23.5256 21.1777C23.9326 22.7734 24.7202 26.4763 22.85 27.526ZM9.12362 27.5111C7.26143 26.47 8.11258 22.8946 8.53957 21.2333C9.76834 21.4969 11.1286 21.6865 12.5824 21.8008C13.4123 22.9332 14.2816 23.9741 15.1576 24.8857C14.0753 25.9008 10.9945 28.557 9.12362 27.5111ZM2.28149 15.9759C2.28149 13.874 5.94207 12.8033 7.65904 12.3326C8.03451 13.5165 8.52695 14.7544 9.12123 16.0062C8.51925 17.2766 8.01977 18.5341 7.64085 19.732C6.00369 19.2776 2.28149 18.0791 2.28149 15.9759ZM9.1037 4.50354C10.9735 3.45416 13.8747 6.00983 15.1159 7.16013C14.2444 8.06754 13.3831 9.1006 12.5603 10.2265C11.1494 10.3533 9.79875 10.5569 8.55709 10.8297C8.09125 9.02071 7.23592 5.55179 9.1037 4.50354ZM20.3793 11.5771C21.3365 11.6942 22.2536 11.85 23.1147 12.0406C22.8562 12.844 22.534 13.6841 22.1545 14.5453C21.6044 13.5333 21.0139 12.5416 20.3793 11.5771ZM16.0143 8.0481C16.6054 8.66897 17.1974 9.3623 17.7798 10.1145C16.5985 10.0603 15.4153 10.0601 14.234 10.1137C14.8169 9.36848 15.414 8.67618 16.0143 8.0481ZM9.8565 14.5444C9.48329 13.6862 9.16398 12.8424 8.90322 12.0275C9.75918 11.8418 10.672 11.69 11.623 11.5748C10.9866 12.5372 10.3971 13.5285 9.8565 14.5444ZM11.6503 20.4657C10.6679 20.3594 9.74126 20.2153 8.88556 20.0347C9.15044 19.2055 9.47678 18.3435 9.85796 17.4668C10.406 18.4933 11.0045 19.4942 11.6503 20.4657ZM16.0498 23.9915C15.4424 23.356 14.8365 22.6531 14.2448 21.8971C15.4328 21.9423 16.6231 21.9424 17.811 21.891C17.2268 22.6608 16.6369 23.3647 16.0498 23.9915ZM22.1667 17.4222C22.5677 18.3084 22.9057 19.1657 23.1742 19.9809C22.3043 20.1734 21.3652 20.3284 20.3757 20.4435C21.015 19.4607 21.6149 18.4536 22.1667 17.4222ZM18.7473 20.5941C16.9301 20.72 15.1016 20.7186 13.2838 20.6044C12.2509 19.1415 11.3314 17.603 10.5377 16.0058C11.3276 14.4119 12.2404 12.8764 13.2684 11.4158C15.0875 11.2825 16.9178 11.2821 18.7369 11.4166C19.7561 12.8771 20.6675 14.4086 21.4757 15.9881C20.6771 17.5812 19.7595 19.1198 18.7473 20.5941ZM22.8303 4.4666C24.7006 5.51254 23.8681 9.22726 23.4595 10.8426C22.2149 10.5641 20.8633 10.3569 19.4483 10.2281C18.6239 9.09004 17.7698 8.05518 16.9124 7.15949C18.1695 5.98441 20.9781 3.43089 22.8303 4.4666Z" fill="#53C1DE"></path> </g>
+                </svg>
+            </a>
+
+            <!-- Bash -->
+            <a href="https://www.gnu.org/software/bash/" target="_blank" class="social-icon" title="Bash">
+                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <rect width="48" height="48" fill="white" fill-opacity="0.01"></rect> <rect x="4" y="8" width="40" height="32" rx="2" fill="#2F88FF" stroke="#000000" stroke-width="4" stroke-linejoin="round"></rect> <path d="M12 18L19 24L12 30" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M23 32H36" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path> </g>
+                </svg>
+            </a>
+
+            <!-- PowerShell -->
+            <a href="#" class="social-icon" title="PowerShell">
+            <svg version="1.1" id="PowerShell" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                width="204.691px" height="154.521px" viewBox="0 0 204.691 154.521" style="enable-background:new 0 0 204.691 154.521;"
+                xml:space="preserve">
+            <g>
+                <path style="display:none;fill-rule:evenodd;clip-rule:evenodd;fill:#2671BE;" d="M-47.547,226.872
+                    c0-97.129,0.094-194.259-0.195-291.387c-0.021-6.982,1.404-8.411,8.388-8.389c94.397,0.292,188.798,0.292,283.195,0
+                    c6.984-0.022,8.41,1.407,8.389,8.389c-0.289,97.128-0.195,194.258-0.195,291.387c-3.238,2.008-6.837,1.129-10.268,1.131
+                    c-93.015,0.049-186.031,0.049-279.047,0C-40.711,228.001-44.31,228.88-47.547,226.872z"/>
+                <path style="fill-rule:evenodd;clip-rule:evenodd;fill:#E0EAF5;" d="M120.14,0.032c23.011-0.008,46.023-0.078,69.034,0.019
+                    c13.68,0.056,17.537,4.627,14.588,18.137c-8.636,39.566-17.466,79.092-26.415,118.589c-2.83,12.484-9.332,17.598-22.465,17.637
+                    c-46.023,0.137-92.046,0.152-138.068-0.006c-15.043-0.053-19-5.148-15.759-19.404C9.849,96.287,18.69,57.582,27.602,18.892
+                    C30.997,4.148,36.099,0.1,51.104,0.057C74.116-0.008,97.128,0.04,120.14,0.032z"/>
+                <path style="fill-rule:evenodd;clip-rule:evenodd;fill:#2671BE;" d="M85.365,149.813c-23.014-0.008-46.029,0.098-69.042-0.053
+                    c-11.67-0.076-13.792-2.83-11.165-14.244c8.906-38.71,18.099-77.355,26.807-116.109C34.3,9.013,39.337,4.419,50.473,4.522
+                    c46.024,0.427,92.056,0.137,138.083,0.184c11.543,0.011,13.481,2.48,10.89,14.187c-8.413,38.007-16.879,76.003-25.494,113.965
+                    c-3.224,14.207-6.938,16.918-21.885,16.951C129.833,149.856,107.598,149.821,85.365,149.813z"/>
+                <path style="fill-rule:evenodd;clip-rule:evenodd;fill:#FDFDFE;" d="M104.948,73.951c-1.543-1.81-3.237-3.894-5.031-5.886
+                    c-10.173-11.3-20.256-22.684-30.61-33.815c-4.738-5.094-6.248-10.041-0.558-15.069c5.623-4.97,11.148-4.53,16.306,1.188
+                    c14.365,15.919,28.713,31.856,43.316,47.556c5.452,5.864,4.182,9.851-1.823,14.196c-23.049,16.683-45.968,33.547-68.862,50.443
+                    c-5.146,3.799-10.052,4.75-14.209-0.861c-4.586-6.189-0.343-9.871,4.414-13.335c17.013-12.392,33.993-24.83,50.9-37.366
+                    C101.146,79.256,104.527,78.238,104.948,73.951z"/>
+                <path style="fill-rule:evenodd;clip-rule:evenodd;fill:#FCFDFD;" d="M112.235,133.819c-6.196,0-12.401,0.213-18.583-0.068
+                    c-4.932-0.223-7.9-2.979-7.838-8.174c0.06-4.912,2.536-8.605,7.463-8.738c13.542-0.363,27.104-0.285,40.651-0.02
+                    c4.305,0.084,7.483,2.889,7.457,7.375c-0.031,5.146-2.739,9.133-8.25,9.465c-6.944,0.42-13.931,0.104-20.899,0.104
+                    C112.235,133.78,112.235,133.8,112.235,133.819z"/>
+            </g>
+            </svg>
+            </a>
+
+        </div>
+
+        </aside>
+    </main>
+
+
+    <script>
+        const modal = document.getElementById('postModal');
+        const modalFrame = document.getElementById('modalFrame');
+        const closeBtn = document.querySelector('.close-btn');
+
+        document.querySelectorAll('.post-card').forEach(card => {
+            card.addEventListener('click', () => {
+            const link = card.getAttribute('data-link');
+            modalFrame.src = link;
+            modal.style.display = 'flex';
+            });
+        });
+
+        closeBtn.addEventListener('click', () => {
+            modal.style.display = 'none';
+            modalFrame.src = '';
+        });
+
+        window.addEventListener('click', (e) => {
+            if (e.target === modal) {
+            modal.style.display = 'none';
+            modalFrame.src = '';
+            }
+        });
+    </script>
+
+    
+    <script>
+        const track = document.querySelector('.carousel-track');
+        const items = Array.from(track.children);
+        const nextButton = document.querySelector('.next');
+        const prevButton = document.querySelector('.prev');
+        let currentIndex = 0;
+
+        function updateCarousel() {
+            const slideWidth = items[0].getBoundingClientRect().width;
+            track.style.transform = `translateX(-${currentIndex * slideWidth}px)`;
+        }
+
+        nextButton.addEventListener('click', () => {
+            currentIndex = (currentIndex + 1) % items.length;
+            updateCarousel();
+        });
+
+        prevButton.addEventListener('click', () => {
+            currentIndex = (currentIndex - 1 + items.length) % items.length;
+            updateCarousel();
+        });
+
+        window.addEventListener('resize', updateCarousel);
+    </script>
+
+    <footer>
+        © 2025 Nicolas France — Todos los derechos reservados.
+    </footer>
+</body>
+</html>

@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FrSystem OS</title>
+<link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --color-barra: rgba(25,25,25,0.9);
+  --color-hover: rgba(80,80,80,0.6);
+  --font: 'Ubuntu', sans-serif;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font);
+  background: url('./imagenes/Diseño\ sin\ título\ \(4\).png') no-repeat center center/cover;
+  height: 100vh;
+  overflow: hidden;
+  transition: background 0.6s ease;
+  color: #fff;
+}
+
+/* === BARRA SUPERIOR === */
+.top-bar {
+  background: var(--color-barra);
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 15px;
+  font-size: 14px;
+  user-select: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+}
+
+.top-bar .center { position: absolute; left: 50%; transform: translateX(-50%); }
+.top-bar .right { display: flex; align-items: center; gap: 15px; position: relative; }
+
+/* === MENÚ DE lenguaje === */
+.lenguaje-menu {
+  position: absolute; right: 0; top: 28px;
+  background: rgba(40,40,40,0.95);
+  border: 1px solid #555;
+  border-radius: 6px;
+  width: 150px;
+  display: none; flex-direction: column;
+  font-size: 13px;
+}
+.lenguaje-menu button {
+  background: none; border: none; color: #fff;
+  text-align: left; cursor: pointer; font-family: var(--font);
+  transition: background 0.2s;
+}
+.lenguaje-menu button:hover { background: var(--color-hover); }
+
+/* === MENÚ DE APAGADO === */
+.power-menu {
+  position: absolute; right: 0; top: 28px;
+  background: rgba(40,40,40,0.95);
+  border: 1px solid #555;
+  border-radius: 6px;
+  width: 150px;
+  display: none; flex-direction: column;
+  font-size: 13px;
+}
+.power-menu button {
+  background: none; border: none; color: #fff;
+  text-align: left; cursor: pointer; font-family: var(--font);
+  transition: background 0.2s;
+}
+.power-menu button:hover { background: var(--color-hover); }
+
+/* === DOCK LATERAL === */
+.dock {
+  position: fixed; top: 28px; left: 0; width: 60px; height: calc(100% - 28px);
+  background: rgba(30,30,30,0.6);
+  display: flex; flex-direction: column; align-items: center;
+  padding-top: 10px; gap: 10px; border-right: 1px solid rgba(255,255,255,0.1);
+}
+.dock-item {
+  position: relative; width: 48px; height: 65px;
+  border-radius: 10px; display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: background 0.2s;
+}
+.dock-item:hover { background: var(--color-hover); }
+.dock-item img { width: 50px; height: 50px; }
+.tooltip {
+  position: absolute; left: 60px; background: rgb(39, 39, 39);
+  color: #fff; padding: 4px 10px; border-radius: 15px;
+  font-size: 13px; white-space: nowrap; opacity: 0;
+  transform: translateY(-50%); pointer-events: none; transition: opacity 0.2s, transform 0.2s;
+}
+.dock-item:hover .tooltip { opacity: 1; transform: translateY(-50%) translateX(5px); }
+
+/* === DESKTOP AREA === */
+.desktop {
+  position: absolute; top: 28px; left: 60px; right: 0; bottom: 0;
+  padding: 20px;
+  display: flex; flex-wrap: wrap; align-content: flex-start; gap: 25px;
+}
+
+/* === ICONOS ESCRITORIO === */
+.icon { text-align: center; width: 80px; cursor: pointer; position: relative; }
+.icon img { width: 64px; height: 64px; }
+.icon p { font-size: 13px; margin-top: 5px; }
+.icon:hover::after {
+  content: attr(data-label);
+  position: absolute; left: 90%; top: 50%;
+  transform: translateY(-50%);
+  background: rgb(39, 39, 39);
+  padding: 4px 10px; border-radius: 10px; white-space: nowrap; font-size: 12px;
+}
+.icon:hover { background: rgba(255,255,255,0.1); border-radius: 8px; }
+
+/* === VENTANAS === */
+.window {
+  position: absolute; top: 100px; left: 100px;
+  width: 600px; min-width: 300px; min-height: 250px;
+  background: rgba(40,40,40,0.95); border: 1px solid #555;
+  border-radius: 8px; box-shadow: 0 0 15px rgba(0,0,0,0.5);
+  display: none; flex-direction: column; resize: both; overflow: hidden;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+.window.active { z-index: 999; transform: scale(1); opacity: 1; }
+.window.hide { transform: scale(0.9); opacity: 0; }
+
+.window-header {
+  background: #2f2f2f; height: 32px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 10px; border-radius: 8px 8px 0 0; cursor: move; flex-shrink: 0;
+}
+.window-header .buttons { display: flex; gap: 6px; }
+.btn { width: 12px; height: 12px; border-radius: 50%; }
+.btn.close { background: #ff5f56; cursor:pointer; }
+.btn.min { background: #ffffff; cursor:pointer; }
+.btn.max { background: #266423; cursor:pointer; }
+
+.window-content { padding: 15px; flex: 1; overflow: auto; }
+
+/* === PDF === */
+.pdf-viewer { display: flex; flex-direction: column; height: 100%; }
+.pdf-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.pdf-controls button {
+  background: rgba(255,255,255,0.1); border: none; color: white;
+  padding: 6px 10px; border-radius: 5px; cursor: pointer; transition: 0.2s;
+}
+.pdf-controls button:hover { background: rgba(255,255,255,0.2); }
+.pdf-frame { flex: 1; overflow: hidden; border-radius: 6px; }
+.pdf-frame iframe { width: 100%; height: 100%; transform-origin: top left; transition: transform 0.3s ease; }
+
+/* Contenedor de los botones de zoom */
+.pdf-controls div:first-child {
+  display: flex;
+  gap: 8px; /* separa los botones + y - */
+}
+
+/* === CONTACTO === */
+*contact-container {margin: 0 auto; }
+/*.form-section { flex:1 1 50%; padding:40px; }
+.form-section input, .form-section textarea { width:100%; padding:10px; margin:8px 0; border-radius:6px; border:1px solid #ccc; }
+.form-section button { background:#414040; color:white; padding:12px 20px; border:none; border-radius:6px; cursor:pointer; }
+.info-section { flex:1 1 50%; padding:40px; background:#f0f4f8; border-left:2px solid #e1e1e1; }
+*/
+form {
+    background: #1e1e1e;
+    padding: 50px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(255,255,255,0.1);
+    width: 400px;
+}
+input, textarea, button {
+    width: 100%;
+    height: 30px;
+    border-radius: 5px;
+    border: none;
+}
+button {
+    background: #ff9800;
+    color: white;
+    cursor: pointer;
+    align-items: center;
+    width: 405px;
+}
+button:hover {
+    background: #e68900;
+}
+
+/* MODO OSCURO */
+body.dark { background: url('./imagenes/Diseño\ sin\ título\ \(5\).png') no-repeat center center/cover; }
+
+/* Contenedor de contacto en dos columnas */
+.contact-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* Formulario y sección de info */
+.form-section, .info-section {
+  flex: 1 1 45%;
+  padding: 15px;
+  border-radius: 10px;
+  background: rgba(30,30,30,0.8);
+  color: #fff;
+}
+
+/* Info section más clara */
+.info-section {
+  background: rgba(240,244,248,0.9);
+  color: #333;
+  border-left: 2px solid #e1e1e1;
+}
+
+/* Toast flotante */
+.toast {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background: rgba(50,50,50,0.9);
+  color: white;
+  padding: 15px 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.5);
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.4s ease;
+  z-index: 2000;
+}
+.toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+  /* address bar row */
+.nav-row{
+    display:flex;
+    gap:10px;
+    padding:10px;
+    align-items:center;
+    background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(0,0,0,0.02));
+    border-bottom:1px solid rgba(0,0,0,0.25);
+}
+
+.nav-left { display:flex; gap:8px; align-items:center; }
+.icon-btn{
+    width:36px;height:36px;border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;
+    background:var(--glass); color:var(--muted); border:1px solid rgba(255,255,255,0.02);
+}
+.icon-btn:hover{ background: rgba(255,255,255,0.04); color:#fff; }
+
+.address-bar {
+    display:flex;
+    align-items:center;
+    gap:10px;
+    background:#202428;
+    border-radius:8px;
+    border:1px solid rgba(255,255,255,0.03);
+    flex:1;
+    min-width:1000%;
+}
+
+.lock{
+    width:18px;height:18px;border-radius:3px;background:transparent;color:var(--muted); display:flex;align-items:center;justify-content:center;
+}
+
+.url-input{
+    outline:none;
+    border: none;
+    background:transparent;
+    color:#e8eef1;
+    font-size:14px;
+    width:100%;
+}
+
+.bookmark-bar{
+    display:flex;
+    gap:8px;
+    margin-left:12px;
+}
+.bookmark{
+    padding:6px 8px;border-radius:6px;background:transparent;color:var(--muted);font-size:13px;cursor:pointer;
+}
+.bookmark:hover{ background: rgba(255,255,255,0.02); color:#fff; }
+
+.firefox-window {
+  position: absolute;
+  top: 50px;
+  left: 50px;
+  width: 1200px;
+  height: 700px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #2b2f33;
+  transition: all 0.25s ease;
+}
+
+
+</style>
+</head>
+<body>
+
+<!-- === BARRA SUPERIOR === -->
+<div class="top-bar">
+  <div class="left">Activities</div>
+  <div class="center" id="time"></div>
+  <div class="right">
+    <span>🔊</span>
+    <span id="lenguajeIcon" style="cursor:pointer;">🌐</span>
+
+    <div class="lenguaje-menu" id="lenguajeMenu">
+    <button id="englishBtn">English Language</button>
+    <button id="spanishBtn">Idioma Español</button>
+    </div>
+    <span id="user">Nico 👤</span>
+    <span id="power" style="cursor:pointer;">⏻</span>
+    <div class="power-menu" id="powerMenu">
+      <button id="darkModeBtn">🌓 Dark Mode</button>
+      <button id="logoutBtn">🔒 Log Out</button>
+    </div>
+  </div>
+</div>
+
+<!-- === DESKTOP AREA === -->
+<div class="desktop">
+
+
+  <!-- === ICONO EN EL DESKTOP PARA MY PROJECTS === -->
+  <div class="icon" data-window="projects" data-label="Mis Proyetos">
+    <img src="./src/resources/icon/firefox.png">
+    <p>My Projects</p>
+  </div>
+
+  <!-- === VENTANA SIMULANDO FIREFOX PARA MY PROJECTS === -->
+  <div class="window" id="projects" style="display:none; position:absolute; top:50px; left:100px; width:150px; height:700px;">
+    <!-- Barra superior de la ventana -->
+    <div class="window-header" id="windowHeader">
+    <img src="./src/resources/icon/firefox.png" style="width: 20px;">
+    <span>My Projects - Firefox</span>
+    <div class="buttons">
+        <div class="btn close"></div>
+        <div class="btn min"></div>
+        <div class="btn max"></div>
+    </div>
+    </div>
+
+
+    <!-- Barra de URL simulada -->
+    
+    <!-- NAVIGATION ROW -->
+    <div class="nav-row">
+        <div class="nav-left">
+        <div class="icon-btn" id="navBack" title="Atrás">◀</div>
+        <div class="icon-btn" id="navForward" title="Adelante">▶</div>
+        <div class="icon-btn" id="navReload" title="Recargar">⟳</div>
+
+        <div class="address-bar">
+            <div class="lock">🔒</div>
+            <input type="text" id="urlInput" class="url-input" value="https://www.projectNF.com" />
+        </div>
+
+        </div>
+    </div>
+    <!--<div style="background:#eee; padding:4px 8px; display:flex; align-items:center; font-size:12px; color:#555;">
+      🔗 https://www.projectsNF.com
+    </div>-->
+
+    <!-- Contenido de la ventana (iframe con el HTML interno) -->
+    <div class="window-content" style="flex:1; display:flex; flex-direction:column; padding:0; height:100%;">
+      <iframe src="/src/myprojects/firefox.html" style="flex:1; border:none; width:100%; height:100%;"></iframe>
+    </div>
+  </div>
+</div>
+
+
+<!-- === DOCK LATERAL === -->
+<div class="dock">
+  <div class="dock-item" data-window="about">
+    <img src="./src/resources/icon/doc.png" alt="About Me"><div class="tooltip">About My</div>
+  </div>
+  <div class="dock-item" data-window="resume">
+    <img src="./src/resources/icon/archivo-pdf.png" alt="Resume"><div class="tooltip">My Resumen</div>
+  </div>
+  <div class="dock-item" data-window="contact">
+    <img src="./src/resources/icon/agregar-mensaje.png" alt="Contact"><div class="tooltip">Contact Me</div>
+  </div>
+</div>
+
+<!-- === VENTANAS === -->
+<div class="window" id="about">
+  <div class="window-header">
+    <span>About My</span>
+    <div class="buttons"><div class="btn close"></div><div class="btn min"></div><div class="btn max"></div></div>
+  </div>
+  <div class="window-content">
+    <h3>Hola 👋, soy Nico France</h3>
+    <p>Desarrollador de sistemas, automatizaciones y soluciones digitales. Apasionado por Linux, IA y optimización de procesos.</p>
+  </div>
+</div>
+
+<div class="window" id="resume">
+  <div class="window-header">
+    <span>My Resumen</span>
+    <div class="buttons"><div class="btn close"></div><div class="btn min"></div><div class="btn max"></div></div>
+  </div>
+  <div class="window-content pdf-viewer">
+    <div class="pdf-controls">
+      <div>
+        <button id="zoomIn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-zoom-in" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M6.5 12a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11M13 6.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0"/>
+                <path d="M10.344 11.742q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1 6.5 6.5 0 0 1-1.398 1.4z"/>
+                <path fill-rule="evenodd" d="M6.5 3a.5.5 0 0 1 .5.5V6h2.5a.5.5 0 0 1 0 1H7v2.5a.5.5 0 0 1-1 0V7H3.5a.5.5 0 0 1 0-1H6V3.5a.5.5 0 0 1 .5-.5"/>
+            </svg>
+        </button>
+        <button id="zoomOut">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-zoom-out" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M6.5 12a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11M13 6.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0"/>
+                <path d="M10.344 11.742q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1 6.5 6.5 0 0 1-1.398 1.4z"/>
+                <path fill-rule="evenodd" d="M3 6.5a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5"/>
+            </svg>
+        </button>
+        </div>
+        <div><button id="savePdf">💾 Save CV</button></div>
+    </div>
+    <div class="pdf-frame"><iframe id="pdfFrame" src="./src/resources/cv.pdf"></iframe></div>
+  </div>
+</div>
+
+<div class="window" id="contact">
+  <div class="window-header">
+    <span>Contact Me</span>
+    <div class="buttons">
+      <div class="btn close"></div>
+      <div class="btn min"></div>
+      <div class="btn max"></div>
+    </div>
+  </div>
+
+    <div class="window-content contact-container">
+    <div class="form-section">
+        <form id="contact-form">
+            <h2 style="color:#ffffff;">Contact Me</h2>
+            <input style="margin: 5px 0px;" type="text" name="from_name" placeholder="Tu nombre" required />
+            <input style="margin: 5px 0px;" type="email" name="reply_to" placeholder="Tu correo" required />
+            <input style="margin: 5px 0px;" type="text" name="subject" placeholder="Asunto" required />
+            <textarea style="margin: 5px 0px;" name="message" placeholder="Mensaje" rows="4" required></textarea>
+            <button style="margin: 5px 0px; align-content: center;" type="submit">Enviar</button>
+            <p id="status"></p>
+        </form>
+        <div class="info-section" style="flex:1 1 50%;background:#f0f4f8; border-left:2px solid #e1e1e1;">
+            <h3 style="color:#414040;"><i class="fas fa-circle-info"></i> ¿Cómo podemos ayudarte?</h3>
+            <p>Al enviar tu mensaje, por favor incluí:</p>
+            <ul style="list-style:none; padding:0;">
+                <li><i class="fas fa-user" style="color:#414040; margin-right:8px;"></i> • Tu nombre completo</li>
+                <li><i class="fas fa-envelope-open-text" style="color:#414040; margin-right:8px;"></i> • Motivo del contacto</li>
+                <li><i class="fas fa-phone" style="color:#414040; margin-right:8px;"></i> • Medio de respuesta (teléfono, email, etc.)</li>
+                <li><i class="fas fa-info-circle" style="color:#414040; margin-right:8px;"></i> • Detalles adicionales importantes</li>
+                <li><i class="fab fa-whatsapp" style="color:#414040; margin-right:8px;"></i> • También podés escribirnos por WhatsApp</li>
+            </ul>
+            <p>¡Te responderemos lo antes posible! Gracias por escribirnos.</p>
+        </div>
+    </div>
+</div>
+
+  <!-- EmailJS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+  <script>
+    (function() {
+      emailjs.init("VdLUk6aGFKhPbVK9K"); // ⚠️ reemplazá esto con tu public key
+    })();
+
+    document.getElementById("contact-form").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const status = document.getElementById("status");
+
+      emailjs.send("service_gmail", "template_ivfua34", {
+        title: "Consulta desde Portafolio",
+        name: e.target.from_name.value,
+        email: e.target.reply_to.value,
+        _subject: e.target.subject.value,
+        message: e.target.message.value,
+      })
+      .then(() => {
+        status.textContent = "✅ Mensaje enviado correctamente";
+        status.style.color = "lightgreen";
+        e.target.reset();
+      })
+      .catch((error) => {
+        status.textContent = "❌ Error al enviar el mensaje";
+        status.style.color = "red";
+        console.error("Error:", error);
+      });
+    });
+  </script>
+
+<script>
+  const lenguajeIcon = document.getElementById('lenguajeIcon');
+  const lenguajeMenu = document.getElementById('lenguajeMenu');
+
+  // Mostrar / ocultar el menú al hacer clic en el icono
+  lenguajeIcon.addEventListener('click', () => {
+    lenguajeMenu.style.display =
+      lenguajeMenu.style.display === 'flex' ? 'none' : 'flex';
+  });
+
+  // Cerrar el menú si se hace clic fuera
+  document.addEventListener('click', (e) => {
+    if (!lenguajeIcon.contains(e.target) && !lenguajeMenu.contains(e.target)) {
+      lenguajeMenu.style.display = 'none';
+    }
+  });
+
+  // Botones de idioma
+  const englishBtn = document.getElementById('englishBtn');
+  const spanishBtn = document.getElementById('spanishBtn');
+
+  englishBtn.addEventListener('click', () => {
+    window.location.href = 'desktop.html';
+  });
+
+  spanishBtn.addEventListener('click', () => {
+    window.location.href = 'escritorio.html';
+  });
+</script>
+
+<script>
+// --------- RELOJ ----------
+setInterval(() => {
+  const now = new Date();
+  document.getElementById('time').textContent =
+    now.toLocaleDateString('es-AR', { day: '2-digit', month: 'short' }) + ' ' +
+    now.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
+},1000);
+
+// --------- MENÚ POWER ----------
+const power = document.getElementById('power');
+const menu = document.getElementById('powerMenu');
+power.addEventListener('click', () => menu.style.display = menu.style.display==='flex'?'none':'flex');
+document.getElementById('logoutBtn').addEventListener('click',()=>window.location.href='index.html');
+// Alternar modo oscuro / claro y cambiar texto del botón
+darkModeBtn.addEventListener('click', () => {
+    document.body.classList.toggle('dark');
+    if(document.body.classList.contains('dark')) {
+        darkModeBtn.textContent = '☀️ Default Mode'; // texto cuando está en oscuro
+    } else {
+        darkModeBtn.textContent = '🌓 Dark Mode'; // texto cuando vuelve al default
+    }
+});
+document.addEventListener('click',e=>{if(!power.contains(e.target)&&!menu.contains(e.target))menu.style.display='none';});
+
+// --------- ABRIR VENTANAS ----------
+const icons = document.querySelectorAll('.icon');
+icons.forEach(icon=>{
+  icon.addEventListener('dblclick',()=>openWindow(icon.dataset.window));
+});
+
+const dockItems = document.querySelectorAll('.dock-item');
+dockItems.forEach(item=>{
+  item.addEventListener('click',()=>openWindow(item.dataset.window));
+});
+
+function openWindow(id){
+  const win = document.getElementById(id);
+  win.style.display='flex';
+  win.classList.add('active');
+  win.style.zIndex = Date.now();
+}
+
+// --------- VENTANAS DRAG ----------
+document.querySelectorAll('.window').forEach(win=>{
+    const header = win.querySelector('.window-header');
+    let isDown=false, offsetX, offsetY, maximized=false, lastPos={};
+    header.addEventListener('mousedown', e=>{
+        if(e.target.classList.contains('max')) return;
+        isDown=true;
+        offsetX=e.clientX-win.offsetLeft;
+        offsetY=e.clientY-win.offsetTop;
+        win.style.zIndex = Date.now();
+    });
+    document.addEventListener('mouseup', ()=>isDown=false);
+    document.addEventListener('mousemove', e=>{if(!isDown) return; win.style.left=(e.clientX-offsetX)+'px'; win.style.top=(e.clientY-offsetY)+'px';});
+
+    // Botón cerrar
+    header.querySelector('.close').addEventListener('click',()=>{win.style.display='none'; win.classList.remove('active');});
+    // Botón minimizar
+    header.querySelector('.min').addEventListener('click',()=>{win.style.display='none';});
+    // Botón maximizar
+    header.querySelector('.max').addEventListener('click',()=>{
+        if(!maximized){
+        lastPos={left:win.offsetLeft,top:win.offsetTop,width:win.offsetWidth,height:win.offsetHeight};
+        const margenHorizontal = 60; 
+        const margenVertical = 30;
+
+        win.style.left = `${margenHorizontal / 100}px`;
+        win.style.top = `${margenVertical / 100}px`;
+        win.style.width = `${window.innerWidth - margenHorizontal}px`;
+        win.style.height = `${window.innerHeight - margenVertical}px`;
+        maximized=true;
+        }else{
+        win.style.left=lastPos.left+'px'; win.style.top=lastPos.top+'px';
+        win.style.width=lastPos.width+'px'; win.style.height=lastPos.height+'px';
+        maximized=false;
+        }
+    });
+});
+
+// --------- PDF ----------
+let zoom=1;
+const pdfFrame=document.getElementById('pdfFrame');
+document.getElementById('zoomIn').addEventListener('click',()=>{zoom+=0.1; pdfFrame.style.transform=`scale(${zoom})`;});
+document.getElementById('zoomOut').addEventListener('click',()=>{zoom=Math.max(0.5,zoom-0.1); pdfFrame.style.transform=`scale(${zoom})`;});
+document.getElementById('savePdf').addEventListener('click',()=>window.open(pdfFrame.src,'_blank'));
+</script>
+
+<div id="toast" class="toast"></div>
+
+<script> 
+    document.querySelectorAll('.window-header').forEach(header => {
+    header.addEventListener('dblclick', () => {
+        const win = header.closest('.window');
+        if (!win) return;
+
+        if (!win.dataset.maximized) {
+        // Guardar posición y tamaño actuales
+        win.dataset.prevLeft = win.offsetLeft;
+        win.dataset.prevTop = win.offsetTop;
+        win.dataset.prevWidth = win.offsetWidth;
+        win.dataset.prevHeight = win.offsetHeight;
+
+        // Maximizar a toda la pantalla (sin márgenes)
+        // Margen opcional (en píxeles)
+        const margenHorizontal = 60; 
+        const margenVertical = 30;
+
+        win.style.left = `${margenHorizontal / 100}px`;
+        win.style.top = `${margenVertical / 100}px`;
+        win.style.width = `${window.innerWidth - margenHorizontal}px`;
+        win.style.height = `${window.innerHeight - margenVertical}px`;
+        win.style.borderRadius = '0';
+        win.dataset.maximized = 'true';
+        } else {
+        // Restaurar tamaño anterior
+        win.style.left = win.dataset.prevLeft + 'px';
+        win.style.top = win.dataset.prevTop + 'px';
+        win.style.width = win.dataset.prevWidth + 'px';
+        win.style.height = win.dataset.prevHeight + 'px';
+        win.style.borderRadius = '8px';
+        delete win.dataset.maximized;
+        }
+        // Botón maximizar
+        document.querySelectorAll('.window-header .max').forEach(btn => {
+        btn.addEventListener('click', e => {
+            const win = btn.closest('.window');
+            if (!win) return;
+            toggleMaximize(win);
+        });
+        });
+    });
+    });
+
+    // Opcional: mantener tamaño correcto si cambia el tamaño del navegador
+    window.addEventListener('resize', () => {
+    document.querySelectorAll('.window[data-maximized="true"]').forEach(win => {
+        win.style.width = `${window.innerWidth}px`;
+        win.style.height = `${window.innerHeight}px`;
+    });
+    });
+</script>
+
+
+
+
+
+</body>
+</html>
