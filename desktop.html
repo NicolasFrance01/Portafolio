@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FrSystem OS</title>
 <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500&display=swap" rel="stylesheet">
+<link rel="icon" href="./imagenes/DANI/dani_1.png" type="image/png">
+<link rel="apple-touch-icon" sizes="180x180" href="./imagenes/DANI/dani_1.png">
+<link rel="icon" type="image/png" sizes="32x32" href="./imagenes/DANI/dani_1.png">
+<link rel="icon" type="image/png" sizes="16x16" href="./imagenes/DANI/dani_1.png">
 <style>
 :root {
   --color-barra: rgba(25,25,25,0.9);
@@ -41,6 +45,7 @@ body {
 
 .top-bar .center { position: absolute; left: 50%; transform: translateX(-50%); }
 .top-bar .right { display: flex; align-items: center; gap: 15px; position: relative; }
+
 
 /* === MENÚ DE lenguaje === */
 .lenguaje-menu {
@@ -185,7 +190,6 @@ button {
     color: white;
     cursor: pointer;
     align-items: center;
-    width: 405px;
 }
 button:hover {
     background: #e68900;
@@ -323,7 +327,7 @@ body.dark { background: url('./imagenes/Diseño\ sin\ título\ \(5\).png') no-re
     <span id="power" style="cursor:pointer;">🚫</span>
     <div class="power-menu" id="powerMenu">
       <button id="darkModeBtn">🌓 Dark Mode</button>
-      <button id="logoutBtn">🔒 Log Out</button>
+      <button id="logoutBtn">🔒 Log out</button>
     </div>
   </div>
 </div>
@@ -339,7 +343,7 @@ body.dark { background: url('./imagenes/Diseño\ sin\ título\ \(5\).png') no-re
   </div>
 
   <!-- === VENTANA SIMULANDO FIREFOX PARA MY PROJECTS === -->
-  <div class="window" id="projects" style="display:none; position:absolute; top:50px; left:100px; width:150px; height:700px;">
+  <div class="window" id="projects" style="display:none; position:absolute; top:50px; left:100px; width:1250px; height:700px;">
     <!-- Barra superior de la ventana -->
     <div class="window-header" id="windowHeader">
     <img src="./src/resources/icon/firefox.png" style="width: 20px;">
@@ -374,7 +378,7 @@ body.dark { background: url('./imagenes/Diseño\ sin\ título\ \(5\).png') no-re
 
     <!-- Contenido de la ventana (iframe con el HTML interno) -->
     <div class="window-content" style="flex:1; display:flex; flex-direction:column; padding:0; height:100%;">
-      <iframe src="/src/myprojects/firefox.html" style="flex:1; border:none; width:100%; height:100%;"></iframe>
+      <iframe src="./src/myprojects/firefox.html" style="flex:1; border:none; width:100%; height:100%;"></iframe>
     </div>
   </div>
 </div>
@@ -383,31 +387,31 @@ body.dark { background: url('./imagenes/Diseño\ sin\ título\ \(5\).png') no-re
 <!-- === DOCK LATERAL === -->
 <div class="dock">
   <div class="dock-item" data-window="about">
-    <img src="./src/resources/icon/doc.png" alt="About Me"><div class="tooltip">About My</div>
+    <img src="./src/resources/icon/doc.png" alt="About Me"><div class="tooltip">About Me</div>
   </div>
   <div class="dock-item" data-window="resume">
-    <img src="./src/resources/icon/archivo-pdf.png" alt="Resume"><div class="tooltip">My Resumen</div>
+    <img src="./src/resources/icon/archivo-pdf.png" alt="Resume"><div class="tooltip">My Summary</div>
   </div>
   <div class="dock-item" data-window="contact">
-    <img src="./src/resources/icon/agregar-mensaje.png" alt="Contact"><div class="tooltip">Contact Me</div>
+    <img src="./src/resources/icon/agregar-mensaje.png" alt="Contact"><div class="tooltip">Contact Mme</div>
   </div>
 </div>
 
 <!-- === VENTANAS === -->
 <div class="window" id="about">
   <div class="window-header">
-    <span>About My</span>
+    <span>About Me</span>
     <div class="buttons"><div class="btn close"></div><div class="btn min"></div><div class="btn max"></div></div>
   </div>
   <div class="window-content">
-    <h3>Hola 👋, soy Nico France</h3>
-    <p>Desarrollador de sistemas, automatizaciones y soluciones digitales. Apasionado por Linux, IA y optimización de procesos.</p>
+    <h3>Hello 👋, I'm Nico France.</h3>
+    <p>Developer of systems, automation, and digital solutions. Passionate about Linux, AI, and process optimization.</p>
   </div>
 </div>
 
 <div class="window" id="resume">
   <div class="window-header">
-    <span>My Resumen</span>
+    <span>My Summary</span>
     <div class="buttons"><div class="btn close"></div><div class="btn min"></div><div class="btn max"></div></div>
   </div>
   <div class="window-content pdf-viewer">
@@ -428,9 +432,9 @@ body.dark { background: url('./imagenes/Diseño\ sin\ título\ \(5\).png') no-re
             </svg>
         </button>
         </div>
-        <div><button id="savePdf">💾 Save CV</button></div>
+        <div><button id="savePdf">💾 Download CV</button></div>
     </div>
-    <div class="pdf-frame"><iframe id="pdfFrame" src="./src/resources/cv.pdf"></iframe></div>
+    <div class="pdf-frame"><iframe id="pdfFrame" src="./src/resources/CV.pdf"></iframe></div>
   </div>
 </div>
 
@@ -447,25 +451,25 @@ body.dark { background: url('./imagenes/Diseño\ sin\ título\ \(5\).png') no-re
     <div class="window-content contact-container">
     <div class="form-section">
         <form id="contact-form">
-            <h2 style="color:#ffffff;">Contact Me</h2>
-            <input style="margin: 5px 0px;" type="text" name="from_name" placeholder="Tu nombre" required />
-            <input style="margin: 5px 0px;" type="email" name="reply_to" placeholder="Tu correo" required />
-            <input style="margin: 5px 0px;" type="text" name="subject" placeholder="Asunto" required />
-            <textarea style="margin: 5px 0px;" name="message" placeholder="Mensaje" rows="4" required></textarea>
-            <button style="margin: 5px 0px; align-content: center;" type="submit">Enviar</button>
+            <h2 style="color:#ffffff;">Contact</h2>
+            <input style="margin: 5px 0px;" type="text" name="from_name" placeholder="Name" required />
+            <input style="margin: 5px 0px;" type="email" name="reply_to" placeholder="Email" required />
+            <input style="margin: 5px 0px;" type="text" name="subject" placeholder="Subject" required />
+            <textarea style="margin: 5px 0px;" name="message" placeholder="Message" rows="4" required></textarea>
+            <button style="margin: 5px 0px; align-content: center;" type="submit">Send</button>
             <p id="status"></p>
         </form>
         <div class="info-section" style="flex:1 1 50%;background:#f0f4f8; border-left:2px solid #e1e1e1;">
-            <h3 style="color:#414040;"><i class="fas fa-circle-info"></i> ¿Cómo podemos ayudarte?</h3>
-            <p>Al enviar tu mensaje, por favor incluí:</p>
+            <h3 style="color:#414040;"><i class="fas fa-circle-info"></i> How can we help you?</h3>
+            <p>When sending your message, please include:</p>
             <ul style="list-style:none; padding:0;">
-                <li><i class="fas fa-user" style="color:#414040; margin-right:8px;"></i> • Tu nombre completo</li>
-                <li><i class="fas fa-envelope-open-text" style="color:#414040; margin-right:8px;"></i> • Motivo del contacto</li>
-                <li><i class="fas fa-phone" style="color:#414040; margin-right:8px;"></i> • Medio de respuesta (teléfono, email, etc.)</li>
-                <li><i class="fas fa-info-circle" style="color:#414040; margin-right:8px;"></i> • Detalles adicionales importantes</li>
-                <li><i class="fab fa-whatsapp" style="color:#414040; margin-right:8px;"></i> • También podés escribirnos por WhatsApp</li>
+                <li><i class="fas fa-user" style="color:#414040; margin-right:8px;"></i> • Full Name</li>
+                <li><i class="fas fa-envelope-open-text" style="color:#414040; margin-right:8px;"></i> • Reason for contacting us</li>
+                <li><i class="fas fa-phone" style="color:#414040; margin-right:8px;"></i> • Response method (phone, email, etc.))</li>
+                <li><i class="fas fa-info-circle" style="color:#414040; margin-right:8px;"></i> • Important additional details</li>
+                <li><i class="fab fa-whatsapp" style="color:#414040; margin-right:8px;"></i> • You can also write to us on WhatsApp.</li>
             </ul>
-            <p>¡Te responderemos lo antes posible! Gracias por escribirnos.</p>
+            <p>We will respond as soon as possible! Thank you for writing to us.</p>
         </div>
     </div>
 </div>
@@ -532,92 +536,92 @@ body.dark { background: url('./imagenes/Diseño\ sin\ título\ \(5\).png') no-re
 </script>
 
 <script>
-// --------- RELOJ ----------
-setInterval(() => {
-  const now = new Date();
-  document.getElementById('time').textContent =
-    now.toLocaleDateString('es-AR', { day: '2-digit', month: 'short' }) + ' ' +
-    now.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
-},1000);
+    // --------- RELOJ ----------
+    setInterval(() => {
+    const now = new Date();
+    document.getElementById('time').textContent =
+        now.toLocaleDateString('es-AR', { day: '2-digit', month: 'short' }) + ' ' +
+        now.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
+    },1000);
 
-// --------- MENÚ POWER ----------
-const power = document.getElementById('power');
-const menu = document.getElementById('powerMenu');
-power.addEventListener('click', () => menu.style.display = menu.style.display==='flex'?'none':'flex');
-document.getElementById('logoutBtn').addEventListener('click',()=>window.location.href='index.html');
-// Alternar modo oscuro / claro y cambiar texto del botón
-darkModeBtn.addEventListener('click', () => {
-    document.body.classList.toggle('dark');
-    if(document.body.classList.contains('dark')) {
-        darkModeBtn.textContent = '☀️ Default Mode'; // texto cuando está en oscuro
-    } else {
-        darkModeBtn.textContent = '🌓 Dark Mode'; // texto cuando vuelve al default
-    }
-});
-document.addEventListener('click',e=>{if(!power.contains(e.target)&&!menu.contains(e.target))menu.style.display='none';});
-
-// --------- ABRIR VENTANAS ----------
-const icons = document.querySelectorAll('.icon');
-icons.forEach(icon=>{
-  icon.addEventListener('dblclick',()=>openWindow(icon.dataset.window));
-});
-
-const dockItems = document.querySelectorAll('.dock-item');
-dockItems.forEach(item=>{
-  item.addEventListener('click',()=>openWindow(item.dataset.window));
-});
-
-function openWindow(id){
-  const win = document.getElementById(id);
-  win.style.display='flex';
-  win.classList.add('active');
-  win.style.zIndex = Date.now();
-}
-
-// --------- VENTANAS DRAG ----------
-document.querySelectorAll('.window').forEach(win=>{
-    const header = win.querySelector('.window-header');
-    let isDown=false, offsetX, offsetY, maximized=false, lastPos={};
-    header.addEventListener('mousedown', e=>{
-        if(e.target.classList.contains('max')) return;
-        isDown=true;
-        offsetX=e.clientX-win.offsetLeft;
-        offsetY=e.clientY-win.offsetTop;
-        win.style.zIndex = Date.now();
-    });
-    document.addEventListener('mouseup', ()=>isDown=false);
-    document.addEventListener('mousemove', e=>{if(!isDown) return; win.style.left=(e.clientX-offsetX)+'px'; win.style.top=(e.clientY-offsetY)+'px';});
-
-    // Botón cerrar
-    header.querySelector('.close').addEventListener('click',()=>{win.style.display='none'; win.classList.remove('active');});
-    // Botón minimizar
-    header.querySelector('.min').addEventListener('click',()=>{win.style.display='none';});
-    // Botón maximizar
-    header.querySelector('.max').addEventListener('click',()=>{
-        if(!maximized){
-        lastPos={left:win.offsetLeft,top:win.offsetTop,width:win.offsetWidth,height:win.offsetHeight};
-        const margenHorizontal = 60; 
-        const margenVertical = 30;
-
-        win.style.left = `${margenHorizontal / 100}px`;
-        win.style.top = `${margenVertical / 100}px`;
-        win.style.width = `${window.innerWidth - margenHorizontal}px`;
-        win.style.height = `${window.innerHeight - margenVertical}px`;
-        maximized=true;
-        }else{
-        win.style.left=lastPos.left+'px'; win.style.top=lastPos.top+'px';
-        win.style.width=lastPos.width+'px'; win.style.height=lastPos.height+'px';
-        maximized=false;
+    // --------- MENÚ POWER ----------
+    const power = document.getElementById('power');
+    const menu = document.getElementById('powerMenu');
+    power.addEventListener('click', () => menu.style.display = menu.style.display==='flex'?'none':'flex');
+    document.getElementById('logoutBtn').addEventListener('click',()=>window.location.href='index.html');
+    // Alternar modo oscuro / claro y cambiar texto del botón
+    darkModeBtn.addEventListener('click', () => {
+        document.body.classList.toggle('dark');
+        if(document.body.classList.contains('dark')) {
+            darkModeBtn.textContent = '☀️ Default mode'; // texto cuando está en oscuro
+        } else {
+            darkModeBtn.textContent = '🌓 Dark Mode'; // texto cuando vuelve al default
         }
     });
-});
+    document.addEventListener('click',e=>{if(!power.contains(e.target)&&!menu.contains(e.target))menu.style.display='none';});
 
-// --------- PDF ----------
-let zoom=1;
-const pdfFrame=document.getElementById('pdfFrame');
-document.getElementById('zoomIn').addEventListener('click',()=>{zoom+=0.1; pdfFrame.style.transform=`scale(${zoom})`;});
-document.getElementById('zoomOut').addEventListener('click',()=>{zoom=Math.max(0.5,zoom-0.1); pdfFrame.style.transform=`scale(${zoom})`;});
-document.getElementById('savePdf').addEventListener('click',()=>window.open(pdfFrame.src,'_blank'));
+    // --------- ABRIR VENTANAS ----------
+    const icons = document.querySelectorAll('.icon');
+    icons.forEach(icon=>{
+    icon.addEventListener('dblclick',()=>openWindow(icon.dataset.window));
+    });
+
+    const dockItems = document.querySelectorAll('.dock-item');
+    dockItems.forEach(item=>{
+    item.addEventListener('click',()=>openWindow(item.dataset.window));
+    });
+
+    function openWindow(id){
+    const win = document.getElementById(id);
+    win.style.display='flex';
+    win.classList.add('active');
+    win.style.zIndex = Date.now();
+    }
+
+    // --------- VENTANAS DRAG ----------
+    document.querySelectorAll('.window').forEach(win=>{
+        const header = win.querySelector('.window-header');
+        let isDown=false, offsetX, offsetY, maximized=false, lastPos={};
+        header.addEventListener('mousedown', e=>{
+            if(e.target.classList.contains('max')) return;
+            isDown=true;
+            offsetX=e.clientX-win.offsetLeft;
+            offsetY=e.clientY-win.offsetTop;
+            win.style.zIndex = Date.now();
+        });
+        document.addEventListener('mouseup', ()=>isDown=false);
+        document.addEventListener('mousemove', e=>{if(!isDown) return; win.style.left=(e.clientX-offsetX)+'px'; win.style.top=(e.clientY-offsetY)+'px';});
+
+        // Botón cerrar
+        header.querySelector('.close').addEventListener('click',()=>{win.style.display='none'; win.classList.remove('active');});
+        // Botón minimizar
+        header.querySelector('.min').addEventListener('click',()=>{win.style.display='none';});
+        // Botón maximizar
+        header.querySelector('.max').addEventListener('click',()=>{
+            if(!maximized){
+            lastPos={left:win.offsetLeft,top:win.offsetTop,width:win.offsetWidth,height:win.offsetHeight};
+            const margenHorizontal = 60; 
+            const margenVertical = 30;
+
+            win.style.left = `${margenHorizontal / 100}px`;
+            win.style.top = `${margenVertical / 100}px`;
+            win.style.width = `${window.innerWidth - margenHorizontal}px`;
+            win.style.height = `${window.innerHeight - margenVertical}px`;
+            maximized=true;
+            }else{
+            win.style.left=lastPos.left+'px'; win.style.top=lastPos.top+'px';
+            win.style.width=lastPos.width+'px'; win.style.height=lastPos.height+'px';
+            maximized=false;
+            }
+        });
+    });
+
+    // --------- PDF ----------
+    let zoom=1;
+    const pdfFrame=document.getElementById('pdfFrame');
+    document.getElementById('zoomIn').addEventListener('click',()=>{zoom+=0.1; pdfFrame.style.transform=`scale(${zoom})`;});
+    document.getElementById('zoomOut').addEventListener('click',()=>{zoom=Math.max(0.5,zoom-0.1); pdfFrame.style.transform=`scale(${zoom})`;});
+    document.getElementById('savePdf').addEventListener('click',()=>window.open(pdfFrame.src,'_blank'));
 </script>
 
 <div id="toast" class="toast"></div>
