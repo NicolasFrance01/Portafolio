@@ -493,12 +493,12 @@ body.dark { background: url('./imagenes/Diseño\ sin\ título\ \(5\).png') no-re
         message: e.target.message.value,
       })
       .then(() => {
-        status.textContent = "✅ Mensaje enviado correctamente";
+        status.textContent = "✅ Message sent successfully";
         status.style.color = "lightgreen";
         e.target.reset();
       })
       .catch((error) => {
-        status.textContent = "❌ Error al enviar el mensaje";
+        status.textContent = "❌ Error sending message";
         status.style.color = "red";
         console.error("Error:", error);
       });
