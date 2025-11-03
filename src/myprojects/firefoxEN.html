@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Firefox - Simulado</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #2b2f33;
+    --bar: #3a3f45;
+    --bar2: #2f3438;
+    --muted: #9aa4ad;
+    --accent: #2ea44f;
+    --tab-active: #ffffff;
+    --tab-inactive: #adb5bd;
+    --glass: rgba(255,255,255,0.03);
+    font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  }
+
+  html,body{height:100%;margin:0;background:var(--bg);color:#e6eef3;}
+  /* Window container */
+  .firefox-window{
+    width: 100%;
+    height: 100vh;
+    display:flex;
+    flex-direction:column;
+    box-sizing:border-box;
+    overflow:hidden;
+  }
+
+  .firefox-window.maximized {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 9999;
+  }
+
+  /* top chrome: tabs + controls */
+  .chrome-top{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    background: linear-gradient(180deg,var(--bar),var(--bar2));
+    border-bottom:1px solid rgba(0,0,0,0.35);
+    -webkit-user-select:none;
+    user-select:none;
+  }
+
+  .tabs {
+    display:flex;
+    gap:8px;
+    align-items:center;
+    flex:1;
+  }
+
+  .tab{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:6px 12px;
+    border-radius:8px 8px 0 0;
+    background: transparent;
+    color:var(--tab-inactive);
+    font-weight: lighter;
+    font-size:13px;
+    box-shadow: none;
+    cursor:pointer;
+  }
+
+  .tab img.tab-icon{ width:16px;height:16px;border-radius:2px;filter:invert(1) contrast(1.1) saturate(0.2); }
+  .tab.active{
+    background: linear-gradient(180deg, rgba(15, 15, 15, 0.03), rgba(0, 0, 0, 0.342));
+    color:var(--tab-active);
+    box-shadow: inset 2px 2px 2px rgba(0,0,0,0.35);
+  }
+
+  .add-tab{
+    padding:6px 10px;
+    border-radius:6px;
+    background:transparent;
+    color:var(--muted);
+    cursor:pointer;
+    font-weight:600;
+  }
+
+  /* right window controls */
+  .window-controls{
+    display:flex;
+    gap:8px;
+    margin-left:auto;
+    align-items:center;
+  }
+  .win-btn{
+    width:34px;height:26px;display:flex;align-items:center;justify-content:center;border-radius:4px;cursor:pointer;color:var(--muted);
+    background:transparent;border:none;font-weight:600;
+  }
+  .win-btn:hover{ background: rgba(255,255,255,0.02); color:#fff; }
+
+  /* content area (where your github will be rendered) */
+  .firefox-content{
+    flex:1;
+    overflow:auto;
+    background: linear-gradient(180deg,#0f1112, #16181a);
+    padding:24px;
+  }
+
+  /* --- Fake GitHub style (dark) --- */
+  .gh-container{
+    max-width:1100px;
+    margin:0 auto;
+    color:#cbd5db;
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto;
+  }
+
+  .gh-top{
+    display:flex;
+    align-items:center;
+    gap:18px;
+    padding:18px 12px;
+    border-bottom:1px solid rgba(255,255,255,0.03);
+  }
+  .gh-avatar img{
+    width: 50%;
+    border-radius: 50%;
+    margin-bottom: 15px;
+    border: 2px solid #30363d;
+  }
+  .gh-meta{
+    flex:1;
+  }
+  .gh-meta h1{ margin:0;font-size:24px;color:#e6eef3; }
+  .gh-meta p{ margin:6px 0;color:var(--muted); }
+
+  .gh-repo-list{
+    margin-top:22px;
+    background:transparent;
+    border-radius:8px;padding:12px;
+  }
+
+  .repo-item{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:12px;
+    border-bottom:1px solid rgba(255,255,255,0.02);
+  }
+  .repo-item:last-child{ border-bottom:none; }
+  .repo-left { display:flex; gap:12px; align-items:center; }
+  .repo-name{ color:#8be9a1; font-weight:600; }
+  .repo-desc{ color:var(--muted); font-size:13px; }
+
+  /* responsive */
+  @media (max-width:900px){
+    .gh-avatar{ width:120px;height:120px;flex:0 0 120px; }
+    .chrome-top{ padding:0px; }
+    .nav-row{ padding:8px; }
+  }
+
+  /* small helpers */
+  .muted{ color:var(--muted); font-size:13px; }
+  .btn-ghost{ background:transparent;border:1px solid rgba(255,255,255,0.04); padding:6px 10px;border-radius:6px;color:var(--muted); cursor:pointer;}
+  .btn-ghost:hover{ color:#fff; background: rgba(255,255,255,0.02); }
+
+  .dani-container {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    gap: 30px;
+    padding: 30px;
+    background-color: #0d1117;
+    color: #c9d1d9;
+  }
+
+  /* --- Izquierda --- */
+  .left-panel {
+    text-align: center;
+  }
+
+  .profile-photo {
+    width: 100%;
+    border-radius: 50%;
+    border: 2px solid #30363d;
+  }
+
+  .profile-info {
+    margin-top: 15px;
+  }
+
+  .profile-photos {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 15px;
+  }
+
+  .profile-photos img {
+    width: 48%;
+    border-radius: 8px;
+    object-fit: cover;
+    border: 1px solid #30363d;
+  }
+
+  /* --- Centro --- */
+  .main-content {
+    text-align: center;
+  }
+
+  .title-section {
+    margin-bottom: 25px;
+  }
+
+  .icon {
+    font-size: 40px;
+    margin-bottom: 5px;
+  }
+
+  .main-content h1 {
+    font-size: 2.5rem;
+    margin: 0;
+  }
+
+  .main-content p {
+    color: #8b949e;
+    font-size: 1rem;
+  }
+
+  .media-section {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .media-section video,
+  .media-section img {
+    width: 100%;
+    border-radius: 10px;
+    border: 1px solid #30363d;
+    background-color: #161b22;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+  }
+
+  /* --- Derecha (Galería) --- */
+  .right-gallery {
+    text-align: center;
+  }
+
+  .gallery-grid2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* o 2, según quieras */
+    gap: 5px; /* 🔹 Ajustá este valor a gusto */
+  }
+
+  .gallery-grid2 img {
+    width: 100%;
+    border-radius: 6px;
+    object-fit: cover;
+    display: block; /* elimina espacio fantasma debajo del img */
+    border: 1px solid #30363d;
+  }
+
+  .h50 { height: 150px; }
+  .h65 { height: 200px; }
+  .h75 { height: 240px; }
+  .h85 { height: 280px; }
+
+  .gallery-grid2 img {
+    object-fit: cover;
+    width: 100%;
+    display: block;
+    border-radius: 6px;
+    border: 1px solid #30363d;
+  }
+
+  .gallery-grid3 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* o 2, según quieras */
+    gap: 5px; /* 🔹 Ajustá este valor a gusto */
+    align-items: center;
+  }
+
+  .gallery-grid3 img {
+    width: 100px;
+    border-radius: 6px;
+    object-fit: cover;
+    display: block; /* elimina espacio fantasma debajo del img */
+    border: 1px solid #30363d;
+    align-items: center;
+  }
+
+  .gallery-grid3 img {
+    object-fit: cover;
+    width: 100px;
+    display: block;
+    border-radius: 6px;
+    border: 1px solid #30363d;
+    align-items: center;
+  }
+
+
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .gallery-grid img {
+    width: 100%;
+    border-radius: 6px;
+    object-fit: cover;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    border: 1px solid #30363d;
+  }
+
+  .gallery-grid img:hover {
+    transform: scale(1.05);
+  }
+
+  /* --- Modal --- */
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 999;
+    padding-top: 60px;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(13, 17, 23, 0.95);
+    justify-content: center;
+    align-items: center;
+  }
+
+  .modal-content {
+    margin: auto;
+    display: block;
+    max-width: 80%;
+    max-height: 80%;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(255,255,255,0.2);
+  }
+
+  .close {
+    position: absolute;
+    top: 30px;
+    right: 50px;
+    color: #fff;
+    font-size: 36px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+
+  .close:hover {
+    color: #58a6ff;
+  }
+
+  @media (max-width: 1000px) {
+    .dani-container {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .firefox-content {
+    background: #0f111a;
+    padding: 50px 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  .dani-container {
+    max-width: 100vw;
+    max-height: 100vw;
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    gap: 40px;
+    background: #0f111a;
+    padding: 40px;
+    border-radius: 12px;
+    color: #c9d1d9;
+  }
+
+  /* --- Columna Izquierda --- */
+  .left-panel {
+    text-align: center;
+  }
+
+  .gh-avatar img {
+    width: 180px;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid #30363d;
+    box-shadow: 0 0 10px rgba(255,255,255,0.05);
+  }
+
+  .profile-info {
+    margin-top: 15px;
+    line-height: 1.5;
+  }
+
+  .profile-info h2 {
+    margin-bottom: 8px;
+    font-size: 22px;
+  }
+
+  .profile-photos {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 15px;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .profile-photos img {
+    width: 100%;
+    border-radius: 10px;
+    object-fit: cover;
+    border: 1px solid #30363d;
+  }
+
+  /* --- Centro --- */
+  .main-content {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .title-section {
+    margin-bottom: 25px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    text-align: left;
+    gap: 10px;
+  }
+
+  .icon {
+    font-size: 40px;
+    margin-bottom: 8px;
+  }
+
+  .main-content h1 {
+    font-size: 2.8rem;
+    margin: 0;
+  }
+
+  .main-content p {
+    color: #8b949e;
+    font-size: 1.45rem;
+  }
+
+  .media-section video {
+    width: 100%;
+    border-radius: 10px;
+    border: 1px solid #30363d;
+    background-color: #161b22;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+  }
+
+  .media-section h3 {
+    margin: none;
+  }
+
+  /* --- Derecha (Galería) --- */
+  .right-gallery {
+    text-align: center;
+  }
+
+  .right-gallery h3 {
+    font-weight: 500;
+    margin-bottom: 10px;
+  }
+
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .gallery-grid img {
+    width: 100%;
+    border-radius: 6px;
+    object-fit: cover;
+    cursor: pointer;
+    transition: transform 0.3s ease, opacity 0.3s;
+    border: 1px solid #30363d;
+  }
+
+  .gallery-grid img:hover {
+    transform: scale(1.05);
+    opacity: 0.9;
+  }
+
+  /* --- Modal --- */
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 999;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(13, 17, 23, 0.95);
+    justify-content: center;
+    align-items: center;
+  }
+
+  .modal-content {
+    margin: auto;
+    max-width: 80%;
+    max-height: 80%;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(255,255,255,0.2);
+  }
+
+  .close {
+    position: absolute;
+    top: 30px;
+    right: 50px;
+    color: #fff;
+    font-size: 36px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+
+  .close:hover {
+    color: #58a6ff;
+  }
+
+  @media (max-width: 1000px) {
+    .dani-container {
+      grid-template-columns: 1fr;
+      padding: 25px;
+    }
+
+    .gh-avatar img {
+      width: 150px;
+      height: 150px;
+    }
+
+    .gallery-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  footer {
+    text-align: center;
+    padding: 5px;
+    border-top: 1px solid #30363d;
+    font-size: 0.8rem;
+    color: #8b949e;
+  }
+</style>
+</head>
+<body>
+
+<div class="firefox-window" id="app">
+
+  <!-- CHROME: TABS + WINDOW CONTROLS -->
+    <div class="chrome-top">
+        <div class="tabs" id="tabs">
+        <div class="tab active" data-tab="github">
+            <a href="./firefoxEN.html" style="color: #cbd5db;">
+            <img class="tab-icon" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23ffffff' d='M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.5.5.09.68-.22.68-.48 0-.24-.01-.87-.01-1.7-2.78.6-3.37-1.2-3.37-1.2-.45-1.15-1.11-1.46-1.11-1.46-.91-.62.07-.61.07-.61 1.01.07 1.54 1.04 1.54 1.04.9 1.54 2.36 1.09 2.94.83.09-.65.35-1.09.63-1.34-2.22-.25-4.56-1.11-4.56-4.95 0-1.09.39-1.98 1.03-2.68-.1-.26-.45-1.28.1-2.66 0 0 .84-.27 2.75 1.03A9.56 9.56 0 0112 6.8c.85.004 1.71.115 2.51.338 1.9-1.3 2.74-1.03 2.74-1.03.56 1.38.21 2.4.1 2.66.64.7 1.03 1.59 1.03 2.68 0 3.85-2.35 4.7-4.58 4.95.36.31.68.92.68 1.85 0 1.33-.01 2.41-.01 2.74 0 .26.18.57.69.47A10.01 10.01 0 0022 12c0-5.52-4.48-10-10-10z'/></svg>">
+            D.A.N.I.</a>
+        </div>
+        <div class="tab">
+            <a href="./repositoriesEN.html" style="color: #cbd5db;">
+            <img class="tab-icon" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23ffffff' d='M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.5.5.09.68-.22.68-.48 0-.24-.01-.87-.01-1.7-2.78.6-3.37-1.2-3.37-1.2-.45-1.15-1.11-1.46-1.11-1.46-.91-.62.07-.61.07-.61 1.01.07 1.54 1.04 1.54 1.04.9 1.54 2.36 1.09 2.94.83.09-.65.35-1.09.63-1.34-2.22-.25-4.56-1.11-4.56-4.95 0-1.09.39-1.98 1.03-2.68-.1-.26-.45-1.28.1-2.66 0 0 .84-.27 2.75 1.03A9.56 9.56 0 0112 6.8c.85.004 1.71.115 2.51.338 1.9-1.3 2.74-1.03 2.74-1.03.56 1.38.21 2.4.1 2.66.64.7 1.03 1.59 1.03 2.68 0 3.85-2.35 4.7-4.58 4.95.36.31.68.92.68 1.85 0 1.33-.01 2.41-.01 2.74 0 .26.18.57.69.47A10.01 10.01 0 0022 12c0-5.52-4.48-10-10-10z'/></svg>">
+            Repositories</a></div>
+        <div class="tab">
+            <a href="./proyectosEN.html" style="color: #cbd5db;">
+            <img class="tab-icon" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23ffffff' d='M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.5.5.09.68-.22.68-.48 0-.24-.01-.87-.01-1.7-2.78.6-3.37-1.2-3.37-1.2-.45-1.15-1.11-1.46-1.11-1.46-.91-.62.07-.61.07-.61 1.01.07 1.54 1.04 1.54 1.04.9 1.54 2.36 1.09 2.94.83.09-.65.35-1.09.63-1.34-2.22-.25-4.56-1.11-4.56-4.95 0-1.09.39-1.98 1.03-2.68-.1-.26-.45-1.28.1-2.66 0 0 .84-.27 2.75 1.03A9.56 9.56 0 0112 6.8c.85.004 1.71.115 2.51.338 1.9-1.3 2.74-1.03 2.74-1.03.56 1.38.21 2.4.1 2.66.64.7 1.03 1.59 1.03 2.68 0 3.85-2.35 4.7-4.58 4.95.36.31.68.92.68 1.85 0 1.33-.01 2.41-.01 2.74 0 .26.18.57.69.47A10.01 10.01 0 0022 12c0-5.52-4.48-10-10-10z'/></svg>">
+            Profile</a></div>
+        <div class="tab">
+            + New Tab</div>
+        </div>
+    </div>
+
+
+  <!-- CONTENT (No iframe; content is part of this page) -->
+  <div class="firefox-content" id="content">
+  <div class="dani-container">
+
+    <!-- Columna Izquierda -->
+    <aside class="left-panel">
+        <div class="gh-avatar">
+          <img src="../../imagenes/unnamed.png" style="border: 3px ; border-radius: 50%;box-shadow: 0 0 35px #601a63;"" alt="Foto de Nicolas France">
+        </div>
+      <div class="profile-info" style="border: white; border-radius: 10px; background-color: #611a6318;box-shadow: 0 0 35px #601a63; padding: 10px;">
+        <h2>Nicolas France</h2>
+        <p style="-webkit-text-stroke-width: thin">Technical Specialist in Systems <br> AI Development, and Web Solutions</p>
+      </div>
+
+      <div class="profile-photos">
+        <img src="../../imagenes/DANI/finalista.jpeg" alt="Foto adicional 1">
+        <img src="../../imagenes/DANI/dani rb.jpeg" alt="Foto adicional 2">
+      </div>
+
+      <br>
+          
+      <h3 style="-webkit-text-stroke-width: thin;border: white; border-radius: 10px; background-color: #611a6318;box-shadow: 0 0 35px #601a63; padding: 10px;">Magazines / Digital Portals</h3>
+      <div class="gallery-grid3">
+        <img class="h100" src="../../imagenes/DANI/blog.jpeg" alt="Img 1">
+        <img class="h100" src="../../imagenes/DANI/blog1.jpeg" alt="Img 2">
+        <img class="h100" src="../../imagenes/DANI/blog2.jpeg" alt="Img 3">
+        <img class="h100" src="../../imagenes/DANI/blog3.jpeg" alt="Img 4">
+      </div>
+
+      <h3 style="-webkit-text-stroke-width: thin;border: white; border-radius: 10px; background-color: #611a6318;box-shadow: 0 0 35px #601a63; padding: 10px;">Acknowledgements</h3>
+      <div class="gallery-grid2">
+        <video width="200" height="370" src="../../imagenes/DANI/video/DANI agradecimientos.mp4" controls playsinline alt="vid"></video>
+        <img class="h100" src="../../imagenes/DANI/agradecimiento.jpeg" alt="Img 2">
+      </div>
+
+      <br>
+
+      <h3 style="-webkit-text-stroke-width: thin;border: white; border-radius: 10px; background-color: #611a6318;box-shadow: 0 0 35px #601a63; padding: 10px;">Production</h3>
+      <div class="gallery-grid2">
+        <video width="200" height="370" src="../../imagenes/DANI/video/produccion dani.mp4" loop controls playsinline alt="vid"></video>
+      </div>
+
+      <br>
+          
+      <h3 style="-webkit-text-stroke-width: thin;border: white; border-radius: 10px; background-color: #611a6318;box-shadow: 0 0 35px #601a63; padding: 10px;">Mail Redbull</h3>
+      <div class="gallery-grid2">
+        <img class="h100" src="../../imagenes/DANI/mail.jpeg" alt="Img 1">
+        <img height="345px" src="../../imagenes/DANI/chill.jpeg" alt="Img 2">
+      </div>
+    </aside>
+
+    <!-- Contenido Central -->
+    <main class="main-content">
+      <div class="title-section">
+        <img src="../../imagenes/DANI/logo.jpeg" style="width: 35%; border: 3px ; border-radius: 50%;box-shadow: 0 0 35px #601a63;">
+        <div>
+          <p style="-webkit-text-stroke-width: thin; color: white; ">D.A.N.I. - <br><br> Dynamic AI for Natural Interactions <br><br> IA Dinamica para Interacciones Naturales </p>
+          <svg onclick="window.open('https://www.instagram.com/dani.iacba','_blank')" style="cursor:pointer;" xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-instagram" viewBox="0 0 16 16">
+              <path d="M8 0C5.829 0 5.556.01 4.703.048 3.85.088 3.269.222 2.76.42a3.9 3.9 0 0 0-1.417.923A3.9 3.9 0 0 0 .42 2.76C.222 3.268.087 3.85.048 4.7.01 5.555 0 5.827 0 8.001c0 2.172.01 2.444.048 3.297.04.852.174 1.433.372 1.942.205.526.478.972.923 1.417.444.445.89.719 1.416.923.51.198 1.09.333 1.942.372C5.555 15.99 5.827 16 8 16s2.444-.01 3.298-.048c.851-.04 1.434-.174 1.943-.372a3.9 3.9 0 0 0 1.416-.923c.445-.445.718-.891.923-1.417.197-.509.332-1.09.372-1.942C15.99 10.445 16 10.173 16 8s-.01-2.445-.048-3.299c-.04-.851-.175-1.433-.372-1.941a3.9 3.9 0 0 0-.923-1.417A3.9 3.9 0 0 0 13.24.42c-.51-.198-1.092-.333-1.943-.372C10.443.01 10.172 0 7.998 0zm-.717 1.442h.718c2.136 0 2.389.007 3.232.046.78.035 1.204.166 1.486.275.373.145.64.319.92.599s.453.546.598.92c.11.281.24.705.275 1.485.039.843.047 1.096.047 3.231s-.008 2.389-.047 3.232c-.035.78-.166 1.203-.275 1.485a2.5 2.5 0 0 1-.599.919c-.28.28-.546.453-.92.598-.28.11-.704.24-1.485.276-.843.038-1.096.047-3.232.047s-2.39-.009-3.233-.047c-.78-.036-1.203-.166-1.485-.276a2.5 2.5 0 0 1-.92-.598 2.5 2.5 0 0 1-.6-.92c-.109-.281-.24-.705-.275-1.485-.038-.843-.046-1.096-.046-3.233s.008-2.388.046-3.231c.036-.78.166-1.204.276-1.486.145-.373.319-.64.599-.92s.546-.453.92-.598c.282-.11.705-.24 1.485-.276.738-.034 1.024-.044 2.515-.045zm4.988 1.328a.96.96 0 1 0 0 1.92.96.96 0 0 0 0-1.92m-4.27 1.122a4.109 4.109 0 1 0 0 8.217 4.109 4.109 0 0 0 0-8.217m0 1.441a2.667 2.667 0 1 1 0 5.334 2.667 2.667 0 0 1 0-5.334"/>
+          </svg> @dani.iacba
+          <svg  onclick="window.open('https://www.youtube.com/@NicolasFrance-p9c','_blank')" style="cursor:pointer;" xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-youtube" viewBox="0 0 16 16">
+            <path d="M8.051 1.999h.089c.822.003 4.987.033 6.11.335a2.01 2.01 0 0 1 1.415 1.42c.101.38.172.883.22 1.402l.01.104.022.26.008.104c.065.914.073 1.77.074 1.957v.075c-.001.194-.01 1.108-.082 2.06l-.008.105-.009.104c-.05.572-.124 1.14-.235 1.558a2.01 2.01 0 0 1-1.415 1.42c-1.16.312-5.569.334-6.18.335h-.142c-.309 0-1.587-.006-2.927-.052l-.17-.006-.087-.004-.171-.007-.171-.007c-1.11-.049-2.167-.128-2.654-.26a2.01 2.01 0 0 1-1.415-1.419c-.111-.417-.185-.986-.235-1.558L.09 9.82l-.008-.104A31 31 0 0 1 0 7.68v-.123c.002-.215.01-.958.064-1.778l.007-.103.003-.052.008-.104.022-.26.01-.104c.048-.519.119-1.023.22-1.402a2.01 2.01 0 0 1 1.415-1.42c.487-.13 1.544-.21 2.654-.26l.17-.007.172-.006.086-.003.171-.007A100 100 0 0 1 7.858 2zM6.4 5.209v4.818l4.157-2.408z"/>
+          </svg> @NicolasFrance
+        </div>
+      </div>
+      <div class="media-section">
+        <h3 style="-webkit-text-stroke-width: thin" >Presentation of D.A.N.I. to Red Bull</h3>
+        <iframe width="auto" height="470" src="https://www.youtube.com/embed/Xh2C3wgPiR0?si=DznpNc4yyBfaVPlv" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+        <h3 style="border: white; border-radius: 10px; background-color: #611a6318;box-shadow: 0 0 35px #601a63; padding: 10px; color: #ffffff;">We were born out of a need to bridge the existing digital divide. <br>
+        We grew to bring everyone together, <br> regardless of the technology you have or the conditions you find yourself in. <br>
+        DANI provides the same accessibility and technology for everyone.</h3>
+
+        <h3 style="-webkit-text-stroke-width: thin" >Red Bull D.A.N.I. Finalist</h3>
+        <iframe width="auto" height="470" src="https://www.youtube.com/embed/2bBUNyvR0ts?si=prIWUgWUoHs5OCOy" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+        <h3 style="-webkit-text-stroke-width: thin;border: white; border-radius: 10px; background-color: #611a6318;box-shadow: 0 0 35px #601a63; padding: 10px;">Dia de Presentacion en Redbull Basement</h3>
+        <div class="gallery-grid2">
+          <iframe width="350" height="525" src="https://www.youtube.com/embed/Pd_tWgMWU50?si=s8TA2iaHnihb6E42" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+          <img class="h90" src="../../imagenes/DANI/dani-wait.jpeg" alt="Img 3">
+          <img width="452.5" height="570" src="../../imagenes/DANI/turn.jpeg" alt="Img 3">
+          <video width="452.5" height="570" src="../../imagenes/DANI/video/previa 2 redbull.mp4" controls playsinline alt="vid 1"></video>
+          <video width="452.5" height="570" src="../../imagenes/DANI/video/Previa redbull.mp4" controls playsinline alt="vid 2"></video>
+          <img width="452.5" height="570" src="../../imagenes/DANI/jueces.jpeg" alt="Img 3">
+        </div>
+
+        <br>
+        <br>
+      </div>
+    </main>
+    
+
+    <!-- Galería Derecha -->
+    <aside class="right-gallery">
+      <h3 style="-webkit-text-stroke-width: thin; border: white; border-radius: 10px; background-color: #611a6318;box-shadow: 0 0 35px #601a63; padding: 10px;">Galería</h3>
+      <div class="gallery-grid">
+        <img src="../../imagenes/DANI/RB10.jpeg" alt="Img 1">
+        <img src="../../imagenes/DANI/RB7.jpeg" alt="Img 2">
+        <img src="../../imagenes/DANI/RB6.jpeg" alt="Img 3">
+        <img src="../../imagenes/DANI/RB2.jpeg" alt="Img 4">
+        <img src="../../imagenes/DANI/RB3.jpeg" alt="Img 5">
+        <img src="../../imagenes/DANI/RB4.jpeg" alt="Img 6">
+        <img src="../../imagenes/DANI/RB5.jpeg" alt="Img 1">
+        <img src="../../imagenes/DANI/RB7.jpeg" alt="Img 2">
+        <img src="../../imagenes/DANI/RB8.jpeg" alt="Img 3">
+        <img src="../../imagenes/DANI/RB9.jpeg" alt="Img 4">
+      </div>
+
+      <br>
+
+      <h3 style="-webkit-text-stroke-width: thin; border: white; border-radius: 10px; background-color: #611a6318;box-shadow: 0 0 35px #601a63; padding: 10px;">PREGUNTAS FRECUENTES</h3>
+      <div class="gallery-grid2">
+        <img class="h85" src="../../imagenes/DANI/qa.jpeg" alt="Img 1">
+        <img class="h85" src="../../imagenes/DANI/qa1.jpeg" alt="Img 2">
+        <img class="h65" src="../../imagenes/DANI/qa2.jpeg" alt="Img 3">
+        <img class="h65" src="../../imagenes/DANI/qa3.jpeg" alt="Img 4">
+        <img class="h85" src="../../imagenes/DANI/qa4.jpeg" alt="Img 5">
+        <img class="h85" src="../../imagenes/DANI/qa5.jpeg" alt="Img 6">
+      </div>
+
+      <br>
+
+      <h3 style="-webkit-text-stroke-width: thin; border: white; border-radius: 10px; background-color: #611a6318;box-shadow: 0 0 35px #601a63; padding: 10px;">Actualizaciones D.A.N.I.</h3>
+      <div class="gallery-grid2">
+        <video width="200" height="400" src="../../imagenes/DANI/video/diseño dani.mp4" controls playsinline alt="vid"></video>
+        <blockquote class="instagram-media" data-instgrm-captioned data-instgrm-permalink="https://www.instagram.com/reel/DJ4YT_LR2dA/?utm_source=ig_embed&amp;utm_campaign=loading" data-instgrm-version="14" style=" background:#0f111a; border:0; border-radius:3px; box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15); margin: 1px; width:200; height:400px; padding:0; width:99.375%; width:-webkit-calc(100% - 2px); width:calc(100% - 2px);"></blockquote>
+        <script async src="//www.instagram.com/embed.js"></script>
+      </div>
+
+      <br>
+
+      <h3 style="-webkit-text-stroke-width: thin;border: white; border-radius: 10px; background-color: #611a6318;box-shadow: 0 0 35px #601a63; padding: 10px;">Origen</h3>
+      <blockquote class="instagram-media" data-instgrm-captioned data-instgrm-permalink="https://www.instagram.com/reel/C-35-rvRShI/?utm_source=ig_embed&amp;utm_campaign=loading" data-instgrm-version="14" style=" background:#0f111a; border:0; border-radius:3px; box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15); margin: 1px; max-width:540px; height:600px; padding:0; width:99.375%; width:-webkit-calc(100% - 2px); width:calc(100% - 2px);"></blockquote>
+      <script async src="//www.instagram.com/embed.js"></script>
+
+
+    </aside>
+
+  </div>
+
+  <!-- Modal para ampliar imágenes -->
+  <div id="imgModal" class="modal">
+    <span class="close">&times;</span>
+    <img class="modal-content" id="imgFull">
+  </div>
+
+    <!-- Página en blanco para New Tab -->
+    <div id="blank" style="display:none;padding:40px;color:var(--muted);">
+      <h2>New tab</h2>
+      <p>Type an address into the URL bar to simulate browsing.</p>
+    </div>
+
+  </div><!-- /content -->
+
+</div><!-- /firefox-window -->
+
+<script>
+  // --- Tabs behavior (visual only) ---
+  const tabsEl = document.getElementById('tabs');
+  const urlInput = document.getElementById('urlInput');
+  const content = document.getElementById('content');
+
+  function activateTab(tabEl){
+    // deactivate all
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    tabEl.classList.add('active');
+
+    // show content corresponding
+    const which = tabEl.dataset.tab;
+    if(which === 'github'){
+      document.getElementById('github').style.display = 'block';
+      document.getElementById('blank').style.display = 'none';
+      urlInput.value = 'https://www.projectNF.com';
+    } else { // newtab or others
+      document.getElementById('github').style.display = 'none';
+      document.getElementById('blank').style.display = 'block';
+      urlInput.value = 'about:newtab';
+    }
+    // update window title (simulate)
+    document.title = (which === 'github' ? 'NicolasFrance — Mozilla Firefox' : 'New Tab — Mozilla Firefox');
+  }
+
+  // init
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => activateTab(tab));
+  });
+
+  // Add new tab (visual only)
+  document.getElementById('addTab').addEventListener('click', () => {
+    const newTab = document.createElement('div');
+    newTab.className = 'tab';
+    newTab.dataset.tab = 'newtab';
+    newTab.textContent = 'New Tab';
+    tabsEl.insertBefore(newTab, document.getElementById('addTab'));
+    newTab.addEventListener('click', () => activateTab(newTab));
+    activateTab(newTab);
+  });
+
+  // URL input: editable and not fixed. On Enter update current tab label (visual).
+  urlInput.addEventListener('keydown', (e) => {
+    if(e.key === 'Enter'){
+      e.preventDefault();
+      const active = document.querySelector('.tab.active');
+      if(active){
+        // set tab text to last part or full URL
+        const val = urlInput.value.trim();
+        // shorten for tab label
+        let label = val.replace(/^https?:\/\//,'').replace(/\/.*$/,'');
+        if(label.length > 18) label = label.slice(0,16) + '…';
+        active.textContent = label;
+        active.dataset.title = val;
+      }
+    }
+  });
+
+  // navigation buttons (visual only)
+  document.getElementById('navBack').addEventListener('click', () => {
+    flashBtn('navBack');
+  });
+  document.getElementById('navForward').addEventListener('click', () => {
+    flashBtn('navForward');
+  });
+  document.getElementById('navReload').addEventListener('click', () => {
+    flashBtn('navReload');
+  });
+
+  function flashBtn(id){
+    const el = document.getElementById(id);
+    el.style.transform = 'translateY(1px)';
+    setTimeout(()=> el.style.transform = '', 160);
+  }
+
+  // window controls (visual only)
+  document.getElementById('btnClose').addEventListener('click', ()=> {
+    // visual close: hide container (simulate close)
+    document.getElementById('app').style.display = 'none';
+  });
+  document.getElementById('btnMin').addEventListener('click', ()=> {
+    document.getElementById('app').style.opacity = '0.0';
+    setTimeout(()=> document.getElementById('app').style.opacity = '1', 400);
+  });
+  document.getElementById('btnMax').addEventListener('click', ()=> {
+    alert('Maximizar (simulado)');
+  });
+
+  // allow clicking bookmarks to set url (simulated)
+  document.querySelectorAll('.bookmark').forEach(b => {
+    b.addEventListener('click', ()=>{
+      urlInput.value = 'https://www.projectNF.com/' + b.textContent.toLowerCase();
+    });
+  });
+
+  // initial activate
+  activateTab(document.querySelector('.tab.active'));
+</script>
+  <script>
+      // Modal de imágenes ampliadas
+      const modal = document.getElementById("imgModal");
+      const modalImg = document.getElementById("imgFull");
+      const closeBtn = document.querySelector(".close");
+
+      document.querySelectorAll(".gallery-grid img").forEach(img => {
+        img.addEventListener("click", () => {
+          modal.style.display = "flex";
+          modalImg.src = img.src;
+        });
+      });
+      document.querySelectorAll(".gallery-grid2 img").forEach(img => {
+        img.addEventListener("click", () => {
+          modal.style.display = "flex";
+          modalImg.src = img.src;
+        });
+      });
+
+      closeBtn.onclick = () => modal.style.display = "none";
+      modal.onclick = e => { if (e.target === modal) modal.style.display = "none"; };
+  </script>
+  
+</body>
+</html>

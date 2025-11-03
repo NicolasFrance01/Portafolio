@@ -1,0 +1,589 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Dashboard · Repositories — GitHub Simulation</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+    /* Window container */
+    .firefox-window{
+        width: 100vw;
+        height: 100vh;
+        display:flex;
+        flex-direction:column;
+        box-sizing:border-box;
+        overflow:hidden;
+        overflow-y: auto; /* permitimos scroll vertical */
+    }
+
+    /* top chrome: tabs + controls */
+    .chrome-top{
+        display:flex;
+        align-items:center;
+        gap:10px;
+        background: linear-gradient(180deg, var(--bar), var(--bar2));
+        border-bottom: 1px solid rgba(0, 0, 0, 0.35);
+        -webkit-user-select:none;
+        user-select:none;
+    }
+
+    .tabs {
+        display:flex;
+        gap:8px;
+        align-items:center;
+        flex:1;
+        
+    }
+
+    .tab{
+        display:flex;
+        align-items:center;
+        gap:8px;
+        padding:6px 12px;
+        border-radius:8px 8px 0 0;
+        background: transparent;
+        color:var(--tab-inactive);
+        font-weight:600;
+        font-size:13px;
+        box-shadow: none;
+        cursor:pointer;
+    }
+
+    .tab img.tab-icon{ width:16px;height:16px;border-radius:2px;filter:invert(1) contrast(1.1) saturate(0.2); }
+    .tab.active{
+        background: linear-gradient(180deg, rgba(15, 15, 15, 0.03), rgba(0, 0, 0, 0.342));
+        color:var(--tab-active);
+        box-shadow: inset 2px 2px 2px rgba(0,0,0,0.35);
+    }
+
+    .add-tab{
+        padding:6px 10px;
+        border-radius:6px;
+        background:transparent;
+        color:var(--muted);
+        cursor:pointer;
+        font-weight:600;
+    }
+
+    /* right window controls */
+    .window-controls{
+        display:flex;
+        gap:8px;
+        margin-left:auto;
+        align-items:center;
+    }
+    .win-btn{
+        width:34px;height:26px;display:flex;align-items:center;justify-content:center;border-radius:4px;cursor:pointer;color:var(--muted);
+        background:transparent;border:none;font-weight:600;
+    }
+    .win-btn:hover{ background: rgba(255,255,255,0.02); color:#fff; }
+
+    /* content area (where your github will be rendered) */
+    .firefox-content{
+        flex:1;
+        overflow:auto;
+        background: linear-gradient(180deg,#0f1112, #16181a);
+        padding:24px;
+    }
+
+
+    /* --- Reset y variables propias (estilo independiente) --- */
+    :root{
+        --bg: #2b2f33;
+        --bar: #3a3f45;
+        --bar2: #2f3438;
+        --muted: #9aa4ad;
+        --accent: #2ea44f;
+        --tab-active: #ffffff;
+        --tab-inactive: #adb5bd;
+        --glass: rgba(255,255,255,0.03);
+        font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    html,body{height:100%;margin:0; background: linear-gradient(180deg,#0f1112, #16181a); color:#e6eef3;}
+
+    /* Layout principal */
+    .page {
+        display: grid;
+        grid-template-columns: 260px 1fr 340px;
+        gap: 24px;
+        max-width: 100vw;
+        padding: 18px;
+        box-sizing: border-box;
+    }
+
+    /* SIDEBAR izquierdo (repositorios) */
+    .sidebar {
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.068), rgba(255,255,255,0.008));
+        margin-left: auto;
+        border-radius: 12px;
+        border: 1px solid var(--line);
+        box-sizing: border-box;
+        overflow: auto;
+        padding: 18px;
+    }
+    .sidebar h3 { margin:0 0 8px 0; font-size:13px; color:var(--text); }
+    .search {
+        display:flex; gap:8px; align-items:center; margin-bottom:12px;
+    }
+    .search input{
+        flex:1; padding:8px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.03);
+        background: rgba(255,255,255,0.02); color:var(--text); font-size:13px;
+    }
+    .repo-list { display:flex; flex-direction:column; gap:6px; margin-top:6px; }
+    .repo-row {
+        display:flex; gap:10px; align-items:center; padding:8px; border-radius:8px; cursor:pointer;
+        transition: background .14s, transform .06s;
+    }
+    .repo-row:hover{ background: var(--glass); transform: translateY(-2px); }
+    .repo-avatar {
+        width:34px;height:34px;border-radius:6px;background:#111;padding:6px;display:flex;align-items:center;justify-content:center;font-weight:700;color:#e6f4ff;font-size:13px;
+    }
+    .repo-info { flex:1; min-width:0; }
+    .repo-info .name { font-weight:600; font-size:13px; color:#bfe7c8; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .repo-info .meta { color:var(--muted); font-size:12px; margin-top:3px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .repo-actions { color:var(--muted); font-size:13px; }
+
+    /* AREA central (Home / feed) */
+    .main {
+        background: linear-gradient(180deg, rgba(37, 37, 37, 0.274), rgba(255,255,255,0.004));
+        border-radius:12px; border:1px solid var(--line); height: calc(100vh); overflow:auto;
+        margin-left: 140px; padding: 20px;
+    }
+
+    .main-top {
+        display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px;
+    }
+    .title { font-size:20px; font-weight:700; color:var(--text); }
+    .controls { display:flex; gap:10px; align-items:center; }
+    .btn { padding:8px 12px; border-radius:8px; border:1px solid rgba(255,255,255,0.03); background:#1982c918; color:var(--muted); cursor:pointer; font-weight:600; font-size:13px; }
+    .btn:hover{ color:#fff; background: var(--glass); }
+
+    .home-card {
+        background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.004));
+        border-radius:10px; border:1px solid rgba(255,255,255,0.02);
+        padding:16px; margin-bottom:14px;
+    }
+    .search-bar {
+        display:flex; gap:8px; align-items:center; padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.02); background:rgba(255,255,255,0.01);
+    }
+    .search-bar input { flex:1; background:transparent;border:none;color:var(--text); outline:none; font-size:14px; }
+    .home-feed { display:flex; flex-direction:column; gap:12px; margin-top:12px; }
+
+    .feed-item { padding:12px; border-radius:8px; background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005)); border:1px solid rgba(255,255,255,0.02); }
+    .feed-item h4 { margin:0 0 6px 0; font-size:15px; color:#f4fbff; }
+    .feed-item p { margin:0; color:var(--muted); font-size:13px; }
+
+    /* RIGHT panel (changelog) */
+    .right {
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.068), rgba(255,255,255,0.008));
+        padding:18px; border-radius:12px; border:1px solid var(--line); height: calc(100vh); overflow:auto;
+    }
+    .right h4{ margin:0 0 10px 0; color:var(--text); font-size:15px; }
+    .timeline { display:flex; flex-direction:column; gap:12px; margin-top:10px; }
+    .timeline-item { display:flex; gap:12px; align-items:flex-start; padding:10px 8px; border-radius:8px; background: rgba(255,255,255,0.005); border:1px solid rgba(255,255,255,0.02); }
+    .timeline-bullet { width:8px;height:8px;border-radius:50%; background:var(--muted-2); margin-top:6px; flex:0 0 8px; }
+    .timeline-content { flex:1; }
+    .timeline-content small { color:var(--muted); display:block; margin-bottom:6px; font-size:12px; }
+    .timeline-content p { margin:0; color:var(--text); font-size:13px; }
+
+    /* detalle repo (en main right below top) */
+    .repo-detail {
+        display:flex; gap:12px; align-items:flex-start; margin-bottom:12px; padding:12px; border-radius:10px; border:1px solid rgba(255,255,255,0.02);
+        background: linear-gradient(180deg, rgba(255,255,255,0.008), rgba(255,255,255,0.004));
+    }
+    .repo-detail .big-avatar{ width:72px;height:72px;border-radius:10px;background:#111;display:flex;align-items:center;justify-content:center;font-weight:700;color:#e6f4ff; font-size:18px; }
+    .repo-detail .info { flex:1; }
+    .repo-detail .info h3{ margin:0; font-size:18px; color:#eaf7ff; }
+    .repo-detail .info p{ margin:6px 0 0 0; color:var(--muted); font-size:13px; }
+
+    /* utilitarios */
+    .muted { color:var(--muted); }
+    .small { font-size:12px; color:var(--muted); }
+    .pill { padding:6px 8px; border-radius:8px; border:1px solid rgba(255,255,255,0.03); background:transparent; color:var(--muted); font-weight:600; font-size:12px; }
+
+    /* responsive */
+    @media (max-width:1100px){
+        .page{ grid-template-columns: 200px 1fr; padding:14px; gap:12px; }
+        .right{ display:none; }
+        .sidebar{ height: calc(100vh - 72px); }
+        .main{ height: calc(100vh - 72px); }
+    }
+    @media (max-width:720px){
+        .page{ grid-template-columns: 1fr; padding:10px; }
+        .sidebar{ order:2; height:auto; }
+        .main{ order:1; }
+        .right{ display:none; }
+    }
+</style>
+</head>
+<body>
+<div class="firefox-window" id="app">
+
+    <!-- CHROME: TABS + WINDOW CONTROLS -->
+    <div class="chrome-top">
+        <div class="tabs" id="tabs">
+        <div class="tab" data-tab="github">
+            <a href="./firefoxEN.html" style="color: #cbd5db;">
+            <img class="tab-icon" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23ffffff' d='M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.5.5.09.68-.22.68-.48 0-.24-.01-.87-.01-1.7-2.78.6-3.37-1.2-3.37-1.2-.45-1.15-1.11-1.46-1.11-1.46-.91-.62.07-.61.07-.61 1.01.07 1.54 1.04 1.54 1.04.9 1.54 2.36 1.09 2.94.83.09-.65.35-1.09.63-1.34-2.22-.25-4.56-1.11-4.56-4.95 0-1.09.39-1.98 1.03-2.68-.1-.26-.45-1.28.1-2.66 0 0 .84-.27 2.75 1.03A9.56 9.56 0 0112 6.8c.85.004 1.71.115 2.51.338 1.9-1.3 2.74-1.03 2.74-1.03.56 1.38.21 2.4.1 2.66.64.7 1.03 1.59 1.03 2.68 0 3.85-2.35 4.7-4.58 4.95.36.31.68.92.68 1.85 0 1.33-.01 2.41-.01 2.74 0 .26.18.57.69.47A10.01 10.01 0 0022 12c0-5.52-4.48-10-10-10z'/></svg>">
+            D.A.N.I.</a>
+        </div>
+        <div class="tab active">
+            <a href="./repositoriesEN.html" style="color: #cbd5db;">
+            <img class="tab-icon" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23ffffff' d='M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.5.5.09.68-.22.68-.48 0-.24-.01-.87-.01-1.7-2.78.6-3.37-1.2-3.37-1.2-.45-1.15-1.11-1.46-1.11-1.46-.91-.62.07-.61.07-.61 1.01.07 1.54 1.04 1.54 1.04.9 1.54 2.36 1.09 2.94.83.09-.65.35-1.09.63-1.34-2.22-.25-4.56-1.11-4.56-4.95 0-1.09.39-1.98 1.03-2.68-.1-.26-.45-1.28.1-2.66 0 0 .84-.27 2.75 1.03A9.56 9.56 0 0112 6.8c.85.004 1.71.115 2.51.338 1.9-1.3 2.74-1.03 2.74-1.03.56 1.38.21 2.4.1 2.66.64.7 1.03 1.59 1.03 2.68 0 3.85-2.35 4.7-4.58 4.95.36.31.68.92.68 1.85 0 1.33-.01 2.41-.01 2.74 0 .26.18.57.69.47A10.01 10.01 0 0022 12c0-5.52-4.48-10-10-10z'/></svg>">
+            Repositories</a></div>
+        <div class="tab">
+            <a href="./proyectosEN.html" style="color: #cbd5db;">
+            <img class="tab-icon" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23ffffff' d='M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.5.5.09.68-.22.68-.48 0-.24-.01-.87-.01-1.7-2.78.6-3.37-1.2-3.37-1.2-.45-1.15-1.11-1.46-1.11-1.46-.91-.62.07-.61.07-.61 1.01.07 1.54 1.04 1.54 1.04.9 1.54 2.36 1.09 2.94.83.09-.65.35-1.09.63-1.34-2.22-.25-4.56-1.11-4.56-4.95 0-1.09.39-1.98 1.03-2.68-.1-.26-.45-1.28.1-2.66 0 0 .84-.27 2.75 1.03A9.56 9.56 0 0112 6.8c.85.004 1.71.115 2.51.338 1.9-1.3 2.74-1.03 2.74-1.03.56 1.38.21 2.4.1 2.66.64.7 1.03 1.59 1.03 2.68 0 3.85-2.35 4.7-4.58 4.95.36.31.68.92.68 1.85 0 1.33-.01 2.41-.01 2.74 0 .26.18.57.69.47A10.01 10.01 0 0022 12c0-5.52-4.48-10-10-10z'/></svg>">
+            Profile</a></div>
+        <div class="tab">
+            + New Tab</div>
+        </div>
+    </div>
+
+    <div style="max-width:1300px;padding:12px; background: linear-gradient(180deg, rgba(255,255,255,0.008), rgba(255,255,255,0.004)); margin: 10px auto; box-shadow: 0 0 15px #414141; border-radius: 10px">
+        <div style="display:flex;align-items:center;gap:40px;margin-bottom:8px;">
+        <div style="font-weight:700;font-size:18px; margin-left: 100px">Activity Board</div>
+        <div style="margin-left:auto;margin-right: 100px; color:var(--muted)">Mode: proactive</div>
+        </div>
+    </div>
+
+    <main class="page" role="main" aria-label="Dashboard Repositorios" >
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar" aria-label="Barra de repositorios"  style="box-shadow: 0 0 15px #414141; border-radius: 10px">
+        <h3 style="font-size:20px; font-weight:700; color:var(--text);">Work Performed</h3>
+
+        <!--<div class="search">
+            <input id="sidebarSearch" placeholder="Buscar repositorios..." aria-label="Buscar repositorios" />
+            <div class="pill" title="Nuevo">New</div>
+        </div>-->
+
+        <div class="repo-list" id="repoList">
+            <!-- Lista estática (tus repositorios) -->
+
+            <div class="repo-row" data-name="chat-educativo">
+            <div class="repo-avatar">CB</div>
+            <div class="repo-info">
+                <div class="name">NicolasFrance01/chat-educativo</div>
+                <div class="meta">Educational Chatbot • Updated 2mo</div>
+            </div>
+            <div class="repo-actions small">★</div>
+            </div>
+
+            <div id="iframeOverlay" style="
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: #ffffff;
+            display: none;
+            flex-direction: column;
+            z-index: 999;
+            ">
+            <div style="display:flex;align-items:center;justify-content:space-between;
+                        background:#1b1e21;border-bottom:1px solid #333;padding:10px 16px;">
+                <div id="iframeTitle" style="font-weight:600;color:#e6eef3;">Cargando...</div>
+                <button id="closeIframe" style="background:transparent;color:#ccc;border:none;
+                            cursor:pointer;font-size:14px;">✕</button>
+            </div>
+            <iframe id="repoIframe" src="" style="border:none;width:100%;flex:1;" allow="geolocation *"></iframe>
+            </div>
+
+            <div class="repo-row" data-name="landingpageprod-sisalud">
+            <div class="repo-avatar">WMS</div>
+            <div class="repo-info">
+                <div class="name">NicolasFrance01/landingpagePROD-sisalud</div>
+                <div class="meta">Ministry of Health website Prod • Updated 2y</div>
+            </div>
+            <div class="repo-actions small">★</div>
+            </div>
+
+            <div class="repo-row" data-name="landingpagepre-sisalud">
+            <div class="repo-avatar">WMS</div>
+            <div class="repo-info">
+                <div class="name">NicolasFrance01/landingpagePRE-sisalud</div>
+                <div class="meta">Ministry of Health website Test• Updated 2y</div>
+            </div>
+            <div class="repo-actions small">★</div>
+            </div>
+
+            <div class="repo-row" data-name="Receptor-Unificado">
+            <div class="repo-avatar">SH</div>
+            <div class="repo-info">
+                <div class="name">NicolasFrance01/Receptor-Unificado</div>
+                <div class="meta">Hospital System • Updated 1y</div>
+            </div>
+            <div class="repo-actions small">★</div>
+            </div>   
+                    
+            <div class="repo-row" data-name="control-ingreso">
+            <div class="repo-avatar">SIE</div>
+            <div class="repo-info">
+                <div class="name">NicolasFrance01/control-ingreso</div>
+                <div class="meta">Business Entry System • Updated 2mo</div>
+            </div>
+            <div class="repo-actions small">★</div>
+            </div>
+
+            <div class="repo-row" data-name="folderSystem">
+            <div class="repo-avatar">RD</div>
+            <div class="repo-info">
+                <div class="name">NicolasFrance01/folderSystem</div>
+                <div class="meta">Document Repository • Updated 1mo</div>
+            </div>
+            <div class="repo-actions small">★</div>
+            </div>
+
+            <div class="repo-row" data-name="Trabajo-Creativo">
+            <div class="repo-avatar">WS</div>
+            <div class="repo-info">
+                <div class="name">NicolasFrance01/Trabajo-Creativo</div>
+                <div class="meta">Digital Marketing web service • Updated 3mo</div>
+            </div>
+            <div class="repo-actions small">★</div>
+            </div>
+
+            <div class="repo-row" data-name="centro-automotores">
+            <div class="repo-avatar">WS</div>
+            <div class="repo-info">
+                <div class="name">NicolasFrance01/centro-automotores</div>
+                <div class="meta">Dealership web service • Updated 6mo</div>
+            </div>
+            <div class="repo-actions small">★</div>
+            </div>
+
+                        <div class="repo-row" data-name="Nissi">
+            <div class="repo-avatar">WS</div>
+            <div class="repo-info">
+                <div class="name">NicolasFrance01/Nissi</div>
+                <div class="meta">Catering web service• Updated 6mo</div>
+            </div>
+            <div class="repo-actions small">★</div>
+            </div>
+
+            <div class="repo-row" data-name="Naturita">
+            <div class="repo-avatar">WS</div>
+            <div class="repo-info">
+                <div class="name">NicolasFrance01/Naturita</div>
+                <div class="meta">Dietetic Web Service • Updated 3mo</div>
+            </div>
+            <div class="repo-actions small">★</div>
+            </div>
+
+            <div class="repo-row" data-name="holymap">
+            <div class="repo-avatar">Land</div>
+            <div class="repo-info">
+                <div class="name">NicolasFrance01/holymap</div>
+                <div class="meta">Church app • Updated 4mo</div>
+            </div>
+            <div class="repo-actions small">★</div>
+            </div>
+
+            <div class="repo-row" data-name="resplandece">
+            <div class="repo-avatar">Land</div>
+            <div class="repo-info">
+                <div class="name">NicolasFrance01/resplandece</div>
+                <div class="meta">Landing • Updated 1y</div>
+            </div>
+            <div class="repo-actions small">★</div>
+            </div>
+
+        </div>
+
+        <!-- pequeño footer en sidebar -->
+        <div style="margin-top:14px;font-size:12px;color:var(--muted);text-align:center;">
+            © 2025 GitHub, Inc. · Terms · Privacy
+        </div>
+        </aside>
+
+        <!-- MAIN -->
+        <section class="main" aria-label="Contenido principal"  style="box-shadow: 0 0 15px #414141; border-radius: 10px">
+        <div class="main-top">
+            <div>
+            <div class="title">Home</div>
+            <div class="utm_medium">Welcome to my professional development</div>
+            </div>
+
+            <!--<div class="controls">
+            <button class="btn" id="newRepoBtn">New</button>
+            <button class="btn" id="createIssue">Create issue</button>
+            <button class="btn" id="sparkBtn">Spark</button>
+            </div>-->
+        </div>
+
+        <!-- detalle del repo seleccionado -->
+        <div id="repoDetailPlaceholder" class="repo-detail" aria-live="polite"  style="box-shadow: 0 0 5px #414141; border-radius: 10px">
+            <div class="big-avatar" id="detailAvatar">NF</div>
+            <div class="info">
+            <h3 id="detailName">Select a repository</h3>
+            <p id="detailDesc" class="muted">Click on one of the repositories on the left to see a simulated preview here.</p>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end;">
+            <div class="pill" id="detailLang">—</div>
+            <!--<div style="width:100%;display:flex;gap:8px;">
+                <button class="btn" id="starDetail">★ Star</button>
+                <button class="btn" id="forkDetail">Fork</button>
+            </div>-->
+            </div>
+        </div>
+
+        <!-- caja de búsqueda dentro del contenido -->
+        <div class="home-card" style="box-shadow: 0 0 5px #414141; border-radius: 10px">
+            
+            <div class="home-feed" id="homeFeed">
+            <div class="feed-item" style=" color: white; border-radius: 10px; background-color: #611a6318;padding: 10px;">
+                <a href="./firefoxEN.html" style="color: #33333300;">
+                <h4>Back to D.A.N.I.</h4>
+                <p class="muted">Back to the<strong> D.A.N.I. </strong>experience</p>
+                </a>
+            </div>
+            <div class="feed-item" style=" color: white; border-radius: 10px; background-color: #1982c918;padding: 10px;">
+                <a href="./proyectosEN.html" style="color: #33333300;">
+                <h4>See more</h4>
+                <p class="muted">I invite you to view my posts in the <strong>profile tab.</strong></p>
+                </a>
+            </div>
+
+            <div class="feed-item" style=" color: white; border-radius: 10px; background-color: #66666618;padding: 10px;">
+                <p class="muted" style="text-align: center;">You will find publications such as...</p>
+            </div>
+
+            <div class="feed-item">
+                <h4>Field experiences</h4>
+                <p class="muted">Social media posts about work done</p>
+            </div>
+
+            <div class="feed-item">
+                <h4>Certificates</h4>
+                <p class="muted">Courses taken to improve my career</p>
+            </div>
+
+            <div class="feed-item" style=" color: white; border-radius: 10px; background-color: #66666618;padding: 10px;">
+                <p class="muted" style="text-align: center;">Among others... Don't miss it!</p>
+            </div>
+            </div>
+        </div>
+
+
+        </section>
+
+        <!-- RIGHT CHANGLOG -->
+        <aside class="right" aria-label="Changelog" style="box-shadow: 0 0 15px #414141; border-radius: 10px">
+        <!-- listado corto de repos (otra sección) -->
+        <div class="home-card" style="color: white; border-radius: 10px; background-color: #fdfcfc0a;padding: 10px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;" >
+                <div style="font-size:20px; font-weight:700; color:var(--text);">Recent Activities</div>
+                <div class="small muted">2025</div>
+            </div>
+
+            <br>
+
+            <div style="margin-top:10px;display:flex;flex-direction:column;gap:10px;">
+            <!-- items replicados con pequeña info -->
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+                <div>
+                <div style="font-weight:300">System Automation</div>
+                <div class="muted small">Optimization systems</div>
+                </div>
+            </div>
+
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+                <div>
+                <div style="font-weight:300">Creation of Intelligent Systems</div>
+                <div class="muted small">Artificial Intelligence</div>
+                </div>
+            </div>
+            </div>
+        </div>
+
+        <div class="timeline">
+            <div class="timeline-item" style="color: white; border-radius: 10px; background-color: #fdfcfc0a;padding: 10px;">
+            <div class="timeline-bullet" style="background:var(--accent)"></div>
+            <div class="timeline-content">
+                <small>1 years ago</small>
+                <p>Specialist in Artificial Intelligence and Automation</p>
+            </div>
+            </div>
+
+            <div class="timeline-item" style="color: white; border-radius: 10px; background-color: #fdfcfc0a;padding: 10px;">
+            <div class="timeline-bullet" style="background:var(--accent)"></div>
+            <div class="timeline-content">
+                <small>2 years ago</small>
+                <p>Technical Specialist in Systems Infrastructure</p>
+            </div>
+            </div>
+
+            <div class="timeline-item" style="color: white; border-radius: 10px; background-color: #fdfcfc0a;padding: 10px;">
+            <div class="timeline-bullet" style="background:var(--accent)"></div>
+            <div class="timeline-content">
+                <small>3 years ago</small>
+                <p>Web Devealoper</p>
+            </div>
+            </div>
+
+            <div style="text-align:center;margin-top:10px;" style="color: white; border-radius: 10px; background-color: #1982c918; padding: 10px;">
+                <a href="./proyectosEN.html" style="color: #1982c918;">
+                <button class="btn" id="viewChangelog">View Profile →</button>
+            </div>
+        </div>
+        </aside>
+
+    </main>
+
+<script>
+    document.querySelectorAll(".repo-row").forEach(row => {
+    row.addEventListener("click", () => {
+        const repoName = row.dataset.name;
+        const iframe = document.getElementById("repoIframe");
+        const overlay = document.getElementById("iframeOverlay");
+        const title = document.getElementById("iframeTitle");
+
+        // Mapeo simple de nombres de repo a URLs reales o locales
+        const urls = {
+        "control-ingreso": "https://nicolasfrance01.github.io/control-ingreso",
+        "resplandece": "https://nicolasfrance01.github.io/resplandece/models/index.html",
+        "holymap": "https://nicolasfrance01.github.io/Holyfind",
+        "folderSystemTEST": "https://nicolasfrance01.github.io/folderSystemTEST",
+        "chat-educativo": "https://nicolasfrance01.github.io/notellm/templates/chat.html",
+        "landingpageprod-sisalud": "https://nicolasfrance01.github.io/landingpage-sisalud/models/landingAutoChangingBackground-Prod.html",
+        "landingpagepre-sisalud": "https://nicolasfrance01.github.io/landingpage-sisalud/models/landingAutoChangingBackground-Pre.html",
+        "Receptor-Unificado": "https://nicolasfrance01.github.io/Receptor-Unificado/models/receptor_cidi.html",
+        "Trabajo-Creativo": "https://www.trabajocreativostudio.com",
+        "Naturita": "https://naturita.github.io/Naturita",
+        "centro-automotores": "https://www.centroautomotoresargentina.com",
+        "Nissi": "https://nissicye.com"
+        };
+
+        const url = urls[repoName] || "about:blank";
+        title.textContent = "Repositorio: " + repoName;
+        overlay.style.display = "flex";
+
+        // Crear un nuevo iframe dinámicamente con permisos de geolocalización
+        const newIframe = document.createElement("iframe");
+        newIframe.id = "repoIframe";
+        newIframe.src = url;
+        newIframe.allow = "geolocation *"; // 🔹 Permite el acceso a ubicación
+        newIframe.style.width = "100%";
+        newIframe.style.height = "100%";
+        newIframe.style.border = "none";
+
+        // Reemplazar el iframe anterior
+        const oldIframe = document.getElementById("repoIframe");
+        oldIframe.replaceWith(newIframe);
+    });
+    });
+
+    // Botón de cierre
+    document.getElementById("closeIframe").addEventListener("click", () => {
+    document.getElementById("iframeOverlay").style.display = "none";
+    document.getElementById("repoIframe").src = "";
+    });
+</script>
+
+
+
+
+</body>
+</html>
