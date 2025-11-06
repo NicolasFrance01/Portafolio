@@ -440,6 +440,9 @@
     }
 
     @media (max-width: 600px) {
+        body, .firefox-window {
+            overflow-x: auto; /* 👈 permite scroll horizontal sin cortar */
+        }
         .carousel-item { flex: 0 0 100%; } /* 1 visible */
         .carousel-item img { height: 200px; }
     }

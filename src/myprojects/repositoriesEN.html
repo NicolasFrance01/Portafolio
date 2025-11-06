@@ -212,6 +212,9 @@
         .main{ height: calc(100vh - 72px); }
     }
     @media (max-width:720px){
+        body, .firefox-window {
+            overflow-x: auto; /* 👈 permite scroll horizontal sin cortar */
+        }
         .page{ grid-template-columns: 1fr; padding:10px; }
         .sidebar{ order:2; height:auto; }
         .main{ order:1; }
